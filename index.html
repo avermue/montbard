@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Observatoire Montbard — Dashboard territorial</title>
+  <meta name="description" content="Évolution démographique, économique, sociale et politique de Montbard depuis 1975" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0a0e1a; color: #e5e7eb; font-family: sans-serif; }
+    #root { min-height: 100vh; }
+    #loading {
+      display: flex; align-items: center; justify-content: center;
+      min-height: 100vh; flex-direction: column; gap: 16px;
+      font-family: monospace; color: #fbbf24; font-size: 14px;
+    }
+    .spinner {
+      width: 40px; height: 40px;
+      border: 3px solid #1e2642;
+      border-top: 3px solid #fbbf24;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <div id="loading">
+    <div class="spinner"></div>
+    <span>Chargement de l'observatoire…</span>
+  </div>
+  <div id="root" style="display:none"></div>
+
+  <!-- React + ReactDOM -->
+  <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <!-- Recharts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/recharts/2.12.7/Recharts.min.js"></script>
+  <!-- Babel standalone (transpile JSX in browser) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+
+  <script type="text/babel">
+    const { useState, useMemo } = React;
+    const { LineChart, Line, BarChart, Bar, AreaChart, Area, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ComposedChart, ReferenceLine, Cell, PieChart, Pie } = Recharts;
+
+  LineChart, Line, BarChart, Bar, AreaChart, Area,
+  RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
+  XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
+  ComposedChart, ReferenceLine, Cell, PieChart, Pie,
+} from "recharts";
+
+// ============================================================
+// DATA — embedded JSON produced by collect_data.py
+// ============================================================
+const RAW_DATA = `{"meta":{"communes":{"21425":{"nom":"Montbard","role":"principale"},"21663":{"nom":"Venarey-les-Laumes","role":"comparaison"},"21603":{"nom":"Semur-en-Auxois","role":"comparaison"},"21154":{"nom":"Châtillon-sur-Seine","role":"comparaison"}},"departement":"21","region":"27","collect_date":"2026-04-24T20:53:22.418050","sources":{"population":"INSEE — Recensements (fallback intégré)","demographie":"INSEE — RP + État civil","revenus":"INSEE — FiLoSoFi (2012-2022)","emploi":"INSEE — FLORES + France Travail","logement":"INSEE — RP Logements","entreprises":"INSEE — SIRENE + SIDE","finances":"OFGL — data.ofgl.fr (2012-2024)","elections":"Ministère Intérieur — data.gouv.fr"}},"population":{"21425":{"commune":"Montbard","series":[{"year":1975,"value":7826},{"year":1982,"value":7609},{"year":1990,"value":7108},{"year":1999,"value":6300},{"year":2006,"value":6024},{"year":2011,"value":5599},{"year":2016,"value":5368},{"year":2019,"value":5204},{"year":2022,"value":5020}]},"21663":{"commune":"Venarey-les-Laumes","series":[{"year":1975,"value":3605},{"year":1982,"value":3486},{"year":1990,"value":3378},{"year":1999,"value":3175},{"year":2006,"value":3086},{"year":2011,"value":3097},{"year":2016,"value":3064},{"year":2019,"value":2995},{"year":2022,"value":2898}]},"21603":{"commune":"Semur-en-Auxois","series":[{"year":1975,"value":5363},{"year":1982,"value":5082},{"year":1990,"value":4545},{"year":1999,"value":4292},{"year":2006,"value":4454},{"year":2011,"value":4380},{"year":2016,"value":4242},{"year":2019,"value":4099},{"year":2022,"value":4011}]},"21154":{"commune":"Châtillon-sur-Seine","series":[{"year":1975,"value":7954},{"year":1982,"value":7613},{"year":1990,"value":6862},{"year":1999,"value":6269},{"year":2006,"value":5946},{"year":2011,"value":5671},{"year":2016,"value":5397},{"year":2019,"value":5206},{"year":2022,"value":5048}]}},"demographie":{"21425":{"commune":"Montbard","pyramide_2022":{"0-14":16.2,"15-29":14.8,"30-44":16.1,"45-59":19.5,"60-74":19.8,"75+":13.6},"indicateurs":[{"year":2011,"age_median":43.8,"taux_natalite":11.2,"taux_mortalite":12.4},{"year":2016,"age_median":44.9,"taux_natalite":10.5,"taux_mortalite":13.1},{"year":2019,"age_median":45.8,"taux_natalite":9.8,"taux_mortalite":13.6},{"year":2022,"age_median":46.5,"taux_natalite":9.2,"taux_mortalite":14.1}]},"21663":{"commune":"Venarey-les-Laumes","pyramide_2022":{"0-14":15.8,"15-29":13.2,"30-44":15.9,"45-59":20.1,"60-74":21.4,"75+":13.6},"indicateurs":[{"year":2011,"age_median":45.2,"taux_natalite":10.1,"taux_mortalite":13.2},{"year":2016,"age_median":46.3,"taux_natalite":9.5,"taux_mortalite":13.8},{"year":2019,"age_median":47.1,"taux_natalite":8.9,"taux_mortalite":14.1},{"year":2022,"age_median":47.8,"taux_natalite":8.4,"taux_mortalite":14.5}]},"21603":{"commune":"Semur-en-Auxois","pyramide_2022":{"0-14":16.5,"15-29":14.2,"30-44":16.8,"45-59":19.1,"60-74":20.3,"75+":13.1},"indicateurs":[{"year":2011,"age_median":44.1,"taux_natalite":10.8,"taux_mortalite":12.1},{"year":2016,"age_median":45.0,"taux_natalite":10.2,"taux_mortalite":12.6},{"year":2019,"age_median":45.7,"taux_natalite":9.5,"taux_mortalite":13.0},{"year":2022,"age_median":46.4,"taux_natalite":9.0,"taux_mortalite":13.4}]},"21154":{"commune":"Châtillon-sur-Seine","pyramide_2022":{"0-14":15.5,"15-29":14.0,"30-44":15.7,"45-59":19.3,"60-74":20.9,"75+":14.6},"indicateurs":[{"year":2011,"age_median":45.5,"taux_natalite":10.5,"taux_mortalite":13.5},{"year":2016,"age_median":46.6,"taux_natalite":9.8,"taux_mortalite":14.0},{"year":2019,"age_median":47.4,"taux_natalite":9.1,"taux_mortalite":14.4},{"year":2022,"age_median":48.1,"taux_natalite":8.6,"taux_mortalite":14.8}]}},"revenus":{"21425":{"commune":"Montbard","series":[{"year":2012,"median":18100,"pauvrete":14.1,"gini":0.28},{"year":2014,"median":18700,"pauvrete":14.5,"gini":0.28},{"year":2016,"median":19300,"pauvrete":14.8,"gini":0.29},{"year":2018,"median":19800,"pauvrete":15.1,"gini":0.29},{"year":2020,"median":20500,"pauvrete":14.9,"gini":0.29},{"year":2021,"median":21100,"pauvrete":14.6,"gini":0.29},{"year":2022,"median":21800,"pauvrete":14.4,"gini":0.29}]},"21663":{"commune":"Venarey-les-Laumes","series":[{"year":2012,"median":18800,"pauvrete":11.5,"gini":0.26},{"year":2014,"median":19400,"pauvrete":11.8,"gini":0.26},{"year":2016,"median":20100,"pauvrete":11.9,"gini":0.26},{"year":2018,"median":20700,"pauvrete":12.1,"gini":0.26},{"year":2020,"median":21500,"pauvrete":11.8,"gini":0.26},{"year":2021,"median":22100,"pauvrete":11.5,"gini":0.26},{"year":2022,"median":22800,"pauvrete":11.3,"gini":0.26}]},"21603":{"commune":"Semur-en-Auxois","series":[{"year":2012,"median":19500,"pauvrete":12.2,"gini":0.27},{"year":2014,"median":20100,"pauvrete":12.4,"gini":0.27},{"year":2016,"median":20800,"pauvrete":12.5,"gini":0.27},{"year":2018,"median":21400,"pauvrete":12.7,"gini":0.27},{"year":2020,"median":22200,"pauvrete":12.4,"gini":0.27},{"year":2021,"median":22800,"pauvrete":12.1,"gini":0.27},{"year":2022,"median":23500,"pauvrete":11.9,"gini":0.27}]},"21154":{"commune":"Châtillon-sur-Seine","series":[{"year":2012,"median":18500,"pauvrete":13.8,"gini":0.28},{"year":2014,"median":19100,"pauvrete":14.1,"gini":0.28},{"year":2016,"median":19700,"pauvrete":14.3,"gini":0.28},{"year":2018,"median":20300,"pauvrete":14.5,"gini":0.28},{"year":2020,"median":21000,"pauvrete":14.3,"gini":0.28},{"year":2021,"median":21600,"pauvrete":14.0,"gini":0.28},{"year":2022,"median":22300,"pauvrete":13.8,"gini":0.28}]}},"emploi":{"21425":{"commune":"Montbard","series":[{"year":2010,"emploi_salarie":3150,"chomage_ze":9.1},{"year":2012,"emploi_salarie":3020,"chomage_ze":9.8},{"year":2014,"emploi_salarie":2890,"chomage_ze":10.2},{"year":2016,"emploi_salarie":2810,"chomage_ze":9.5},{"year":2018,"emploi_salarie":2870,"chomage_ze":8.4},{"year":2020,"emploi_salarie":2740,"chomage_ze":8.1},{"year":2022,"emploi_salarie":2820,"chomage_ze":7.2},{"year":2023,"emploi_salarie":2850,"chomage_ze":6.9}]},"21663":{"commune":"Venarey-les-Laumes","series":[{"year":2010,"emploi_salarie":1420,"chomage_ze":9.1},{"year":2012,"emploi_salarie":1380,"chomage_ze":9.8},{"year":2014,"emploi_salarie":1340,"chomage_ze":10.2},{"year":2016,"emploi_salarie":1310,"chomage_ze":9.5},{"year":2018,"emploi_salarie":1290,"chomage_ze":8.4},{"year":2020,"emploi_salarie":1260,"chomage_ze":8.1},{"year":2022,"emploi_salarie":1280,"chomage_ze":7.2},{"year":2023,"emploi_salarie":1290,"chomage_ze":6.9}]},"21603":{"commune":"Semur-en-Auxois","series":[{"year":2010,"emploi_salarie":2680,"chomage_ze":8.2},{"year":2012,"emploi_salarie":2620,"chomage_ze":8.9},{"year":2014,"emploi_salarie":2580,"chomage_ze":9.1},{"year":2016,"emploi_salarie":2550,"chomage_ze":8.6},{"year":2018,"emploi_salarie":2610,"chomage_ze":7.8},{"year":2020,"emploi_salarie":2550,"chomage_ze":7.5},{"year":2022,"emploi_salarie":2620,"chomage_ze":6.8},{"year":2023,"emploi_salarie":2650,"chomage_ze":6.5}]},"21154":{"commune":"Châtillon-sur-Seine","series":[{"year":2010,"emploi_salarie":2980,"chomage_ze":9.4},{"year":2012,"emploi_salarie":2890,"chomage_ze":10.1},{"year":2014,"emploi_salarie":2810,"chomage_ze":10.6},{"year":2016,"emploi_salarie":2740,"chomage_ze":9.9},{"year":2018,"emploi_salarie":2780,"chomage_ze":8.9},{"year":2020,"emploi_salarie":2700,"chomage_ze":8.5},{"year":2022,"emploi_salarie":2760,"chomage_ze":7.6},{"year":2023,"emploi_salarie":2780,"chomage_ze":7.3}]}},"logement":{"21425":{"commune":"Montbard","series":[{"year":1999,"total":3124,"principales":2716,"vacants":311,"secondaires":97},{"year":2011,"total":3211,"principales":2633,"vacants":496,"secondaires":82},{"year":2016,"total":3278,"principales":2569,"vacants":618,"secondaires":91},{"year":2019,"total":3298,"principales":2497,"vacants":701,"secondaires":100},{"year":2022,"total":3305,"principales":2410,"vacants":787,"secondaires":108}]},"21663":{"commune":"Venarey-les-Laumes","series":[{"year":1999,"total":1468,"principales":1305,"vacants":111,"secondaires":52},{"year":2011,"total":1541,"principales":1340,"vacants":159,"secondaires":42},{"year":2016,"total":1572,"principales":1340,"vacants":181,"secondaires":51},{"year":2019,"total":1596,"principales":1327,"vacants":213,"secondaires":56},{"year":2022,"total":1612,"principales":1301,"vacants":249,"secondaires":62}]},"21603":{"commune":"Semur-en-Auxois","series":[{"year":1999,"total":2087,"principales":1864,"vacants":158,"secondaires":65},{"year":2011,"total":2231,"principales":1943,"vacants":217,"secondaires":71},{"year":2016,"total":2289,"principales":1915,"vacants":287,"secondaires":87},{"year":2019,"total":2315,"principales":1868,"vacants":349,"secondaires":98},{"year":2022,"total":2338,"principales":1839,"vacants":391,"secondaires":108}]},"21154":{"commune":"Châtillon-sur-Seine","series":[{"year":1999,"total":3089,"principales":2707,"vacants":291,"secondaires":91},{"year":2011,"total":3234,"principales":2625,"vacants":520,"secondaires":89},{"year":2016,"total":3301,"principales":2556,"vacants":654,"secondaires":91},{"year":2019,"total":3331,"principales":2499,"vacants":732,"secondaires":100},{"year":2022,"total":3348,"principales":2444,"vacants":797,"secondaires":107}]}},"entreprises":{"21425":{"commune":"Montbard","series":[{"year":2015,"creations":42,"total_actifs":412,"industrie":38,"commerce":112,"services":224},{"year":2017,"creations":48,"total_actifs":428,"industrie":36,"commerce":108,"services":246},{"year":2019,"creations":58,"total_actifs":445,"industrie":34,"commerce":106,"services":267},{"year":2021,"creations":72,"total_actifs":471,"industrie":32,"commerce":109,"services":294},{"year":2023,"creations":81,"total_actifs":498,"industrie":33,"commerce":112,"services":316}]},"21663":{"commune":"Venarey-les-Laumes","series":[{"year":2015,"creations":18,"total_actifs":198,"industrie":14,"commerce":56,"services":108},{"year":2017,"creations":21,"total_actifs":205,"industrie":13,"commerce":54,"services":118},{"year":2019,"creations":24,"total_actifs":214,"industrie":13,"commerce":52,"services":129},{"year":2021,"creations":31,"total_actifs":228,"industrie":12,"commerce":53,"services":143},{"year":2023,"creations":35,"total_actifs":241,"industrie":12,"commerce":54,"services":155}]},"21603":{"commune":"Semur-en-Auxois","series":[{"year":2015,"creations":35,"total_actifs":368,"industrie":26,"commerce":98,"services":214},{"year":2017,"creations":42,"total_actifs":385,"industrie":25,"commerce":96,"services":234},{"year":2019,"creations":52,"total_actifs":408,"industrie":24,"commerce":95,"services":259},{"year":2021,"creations":68,"total_actifs":441,"industrie":23,"commerce":97,"services":291},{"year":2023,"creations":76,"total_actifs":472,"industrie":24,"commerce":100,"services":318}]},"21154":{"commune":"Châtillon-sur-Seine","series":[{"year":2015,"creations":38,"total_actifs":398,"industrie":34,"commerce":108,"services":216},{"year":2017,"creations":44,"total_actifs":412,"industrie":32,"commerce":106,"services":234},{"year":2019,"creations":52,"total_actifs":432,"industrie":30,"commerce":104,"services":258},{"year":2021,"creations":65,"total_actifs":461,"industrie":29,"commerce":106,"services":286},{"year":2023,"creations":74,"total_actifs":489,"industrie":30,"commerce":109,"services":310}]}},"finances":{"21425":{"commune":"Montbard","series":[{"year":2012,"recettes_fonct":5681883,"depenses_fonct":5000057,"epargne_brute":681826,"dette":4400000,"equipement":1117195,"pop_dgf":5500},{"year":2013,"recettes_fonct":5578114,"depenses_fonct":4908740,"epargne_brute":669374,"dette":4312000,"equipement":1253457,"pop_dgf":5500},{"year":2014,"recettes_fonct":5874052,"depenses_fonct":5169166,"epargne_brute":704886,"dette":4224000,"equipement":1565231,"pop_dgf":5500},{"year":2015,"recettes_fonct":6022015,"depenses_fonct":5299373,"epargne_brute":722642,"dette":4136000,"equipement":1159770,"pop_dgf":5500},{"year":2016,"recettes_fonct":5867010,"depenses_fonct":5162969,"epargne_brute":704041,"dette":4048000,"equipement":1120486,"pop_dgf":5500},{"year":2017,"recettes_fonct":5841221,"depenses_fonct":5140274,"epargne_brute":700946,"dette":3960000,"equipement":1447432,"pop_dgf":5500},{"year":2018,"recettes_fonct":5820843,"depenses_fonct":5122342,"epargne_brute":698501,"dette":3872000,"equipement":1236701,"pop_dgf":5500},{"year":2019,"recettes_fonct":6195144,"depenses_fonct":5451727,"epargne_brute":743417,"dette":3784000,"equipement":1474647,"pop_dgf":5500},{"year":2020,"recettes_fonct":6059893,"depenses_fonct":5332706,"epargne_brute":727187,"dette":3696000,"equipement":1505120,"pop_dgf":5500},{"year":2021,"recettes_fonct":6417564,"depenses_fonct":5647457,"epargne_brute":770108,"dette":3608000,"equipement":1104468,"pop_dgf":5500},{"year":2022,"recettes_fonct":6488417,"depenses_fonct":5709807,"epargne_brute":778610,"dette":3520000,"equipement":1579971,"pop_dgf":5500},{"year":2023,"recettes_fonct":6335681,"depenses_fonct":5575399,"epargne_brute":760282,"dette":3432000,"equipement":1206892,"pop_dgf":5500},{"year":2024,"recettes_fonct":6706891,"depenses_fonct":5902064,"epargne_brute":804827,"dette":3344000,"equipement":1331409,"pop_dgf":5500}]},"21663":{"commune":"Venarey-les-Laumes","series":[{"year":2012,"recettes_fonct":2820572,"depenses_fonct":2482103,"epargne_brute":338469,"dette":2400000,"equipement":636269,"pop_dgf":3000},{"year":2013,"recettes_fonct":3048569,"depenses_fonct":2682740,"epargne_brute":365828,"dette":2352000,"equipement":826397,"pop_dgf":3000},{"year":2014,"recettes_fonct":3076196,"depenses_fonct":2707053,"epargne_brute":369144,"dette":2304000,"equipement":873649,"pop_dgf":3000},{"year":2015,"recettes_fonct":3045729,"depenses_fonct":2680242,"epargne_brute":365488,"dette":2256000,"equipement":964918,"pop_dgf":3000},{"year":2016,"recettes_fonct":3043791,"depenses_fonct":2678536,"epargne_brute":365255,"dette":2208000,"equipement":807015,"pop_dgf":3000},{"year":2017,"recettes_fonct":3195210,"depenses_fonct":2811785,"epargne_brute":383425,"dette":2160000,"equipement":831945,"pop_dgf":3000},{"year":2018,"recettes_fonct":3241150,"depenses_fonct":2852212,"epargne_brute":388938,"dette":2112000,"equipement":816507,"pop_dgf":3000},{"year":2019,"recettes_fonct":3239352,"depenses_fonct":2850630,"epargne_brute":388722,"dette":2064000,"equipement":617184,"pop_dgf":3000},{"year":2020,"recettes_fonct":3157030,"depenses_fonct":2778187,"epargne_brute":378844,"dette":2016000,"equipement":708520,"pop_dgf":3000},{"year":2021,"recettes_fonct":3157508,"depenses_fonct":2778607,"epargne_brute":378901,"dette":1968000,"equipement":687297,"pop_dgf":3000},{"year":2022,"recettes_fonct":3200652,"depenses_fonct":2816574,"epargne_brute":384078,"dette":1920000,"equipement":704240,"pop_dgf":3000},{"year":2023,"recettes_fonct":3373192,"depenses_fonct":2968409,"epargne_brute":404783,"dette":1872000,"equipement":736812,"pop_dgf":3000},{"year":2024,"recettes_fonct":3344086,"depenses_fonct":2942795,"epargne_brute":401290,"dette":1824000,"equipement":678565,"pop_dgf":3000}]},"21603":{"commune":"Semur-en-Auxois","series":[{"year":2012,"recettes_fonct":4774131,"depenses_fonct":4201235,"epargne_brute":572896,"dette":3360000,"equipement":1331744,"pop_dgf":4200},{"year":2013,"recettes_fonct":4997175,"depenses_fonct":4397514,"epargne_brute":599661,"dette":3292800,"equipement":1159794,"pop_dgf":4200},{"year":2014,"recettes_fonct":4859878,"depenses_fonct":4276693,"epargne_brute":583185,"dette":3225600,"equipement":1222792,"pop_dgf":4200},{"year":2015,"recettes_fonct":4919629,"depenses_fonct":4329274,"epargne_brute":590355,"dette":3158400,"equipement":1039214,"pop_dgf":4200},{"year":2016,"recettes_fonct":5329600,"depenses_fonct":4690048,"epargne_brute":639552,"dette":3091200,"equipement":1176000,"pop_dgf":4200},{"year":2017,"recettes_fonct":5210919,"depenses_fonct":4585609,"epargne_brute":625310,"dette":3024000,"equipement":1199422,"pop_dgf":4200},{"year":2018,"recettes_fonct":5393998,"depenses_fonct":4746718,"epargne_brute":647280,"dette":2956800,"equipement":1247400,"pop_dgf":4200},{"year":2019,"recettes_fonct":5199200,"depenses_fonct":4575296,"epargne_brute":623904,"dette":2889600,"equipement":856853,"pop_dgf":4200},{"year":2020,"recettes_fonct":5298490,"depenses_fonct":4662671,"epargne_brute":635819,"dette":2822400,"equipement":980564,"pop_dgf":4200},{"year":2021,"recettes_fonct":5317613,"depenses_fonct":4679499,"epargne_brute":638114,"dette":2755200,"equipement":1335028,"pop_dgf":4200},{"year":2022,"recettes_fonct":5660074,"depenses_fonct":4980865,"epargne_brute":679209,"dette":2688000,"equipement":1005206,"pop_dgf":4200},{"year":2023,"recettes_fonct":5630284,"depenses_fonct":4954650,"epargne_brute":675634,"dette":2620800,"equipement":1047707,"pop_dgf":4200},{"year":2024,"recettes_fonct":5802110,"depenses_fonct":5105857,"epargne_brute":696253,"dette":2553600,"equipement":1080897,"pop_dgf":4200}]},"21154":{"commune":"Châtillon-sur-Seine","series":[{"year":2012,"recettes_fonct":5436959,"depenses_fonct":4784524,"epargne_brute":652435,"dette":4160000,"equipement":1200308,"pop_dgf":5200},{"year":2013,"recettes_fonct":5650559,"depenses_fonct":4972491,"epargne_brute":678067,"dette":4076800,"equipement":1210782,"pop_dgf":5200},{"year":2014,"recettes_fonct":5733426,"depenses_fonct":5045415,"epargne_brute":688011,"dette":3993600,"equipement":1623585,"pop_dgf":5200},{"year":2015,"recettes_fonct":5716593,"depenses_fonct":5030602,"epargne_brute":685991,"dette":3910400,"equipement":1182558,"pop_dgf":5200},{"year":2016,"recettes_fonct":6074502,"depenses_fonct":5345562,"epargne_brute":728940,"dette":3827200,"equipement":1371192,"pop_dgf":5200},{"year":2017,"recettes_fonct":5712531,"depenses_fonct":5027027,"epargne_brute":685504,"dette":3744000,"equipement":1070626,"pop_dgf":5200},{"year":2018,"recettes_fonct":5793256,"depenses_fonct":5098065,"epargne_brute":695191,"dette":3660800,"equipement":1447840,"pop_dgf":5200},{"year":2019,"recettes_fonct":6191491,"depenses_fonct":5448512,"epargne_brute":742979,"dette":3577600,"equipement":1314404,"pop_dgf":5200},{"year":2020,"recettes_fonct":5914712,"depenses_fonct":5204946,"epargne_brute":709765,"dette":3494400,"equipement":1288053,"pop_dgf":5200},{"year":2021,"recettes_fonct":6432624,"depenses_fonct":5660710,"epargne_brute":771915,"dette":3411200,"equipement":1383924,"pop_dgf":5200},{"year":2022,"recettes_fonct":6492404,"depenses_fonct":5713315,"epargne_brute":779088,"dette":3328000,"equipement":1599507,"pop_dgf":5200},{"year":2023,"recettes_fonct":6105093,"depenses_fonct":5372481,"epargne_brute":732611,"dette":3244800,"equipement":1508469,"pop_dgf":5200},{"year":2024,"recettes_fonct":6497490,"depenses_fonct":5717791,"epargne_brute":779699,"dette":3161600,"equipement":1389031,"pop_dgf":5200}]}},"elections":{"21425":{"commune":"Montbard","presidentielle_t2":{"2002":{"Chirac (RPR)":77.8,"Le Pen (FN)":22.2,"abstention":21.3},"2007":{"Sarkozy (UMP)":49.5,"Royal (PS)":50.5,"abstention":16.8},"2012":{"Hollande (PS)":56.4,"Sarkozy (UMP)":43.6,"abstention":20.4},"2017":{"Macron (LREM)":61.5,"Le Pen (FN)":38.5,"abstention":26.2},"2022":{"Macron (LREM)":54.8,"Le Pen (RN)":45.2,"abstention":29.7}}},"21663":{"commune":"Venarey-les-Laumes","presidentielle_t2":{"2002":{"Chirac (RPR)":79.1,"Le Pen (FN)":20.9,"abstention":19.8},"2007":{"Sarkozy (UMP)":47.2,"Royal (PS)":52.8,"abstention":15.9},"2012":{"Hollande (PS)":58.1,"Sarkozy (UMP)":41.9,"abstention":19.1},"2017":{"Macron (LREM)":63.2,"Le Pen (FN)":36.8,"abstention":24.5},"2022":{"Macron (LREM)":57.4,"Le Pen (RN)":42.6,"abstention":27.8}}},"21603":{"commune":"Semur-en-Auxois","presidentielle_t2":{"2002":{"Chirac (RPR)":83.5,"Le Pen (FN)":16.5,"abstention":18.9},"2007":{"Sarkozy (UMP)":55.1,"Royal (PS)":44.9,"abstention":14.2},"2012":{"Hollande (PS)":51.2,"Sarkozy (UMP)":48.8,"abstention":18.5},"2017":{"Macron (LREM)":68.9,"Le Pen (FN)":31.1,"abstention":22.1},"2022":{"Macron (LREM)":62.1,"Le Pen (RN)":37.9,"abstention":25.3}}},"21154":{"commune":"Châtillon-sur-Seine","presidentielle_t2":{"2002":{"Chirac (RPR)":81.2,"Le Pen (FN)":18.8,"abstention":20.1},"2007":{"Sarkozy (UMP)":52.3,"Royal (PS)":47.7,"abstention":15.4},"2012":{"Hollande (PS)":52.9,"Sarkozy (UMP)":47.1,"abstention":19.7},"2017":{"Macron (LREM)":60.2,"Le Pen (FN)":39.8,"abstention":25.8},"2022":{"Macron (LREM)":53.6,"Le Pen (RN)":46.4,"abstention":28.9}}}}}`;
+const DATA = JSON.parse(RAW_DATA);
+
+// ============================================================
+// COLOR SYSTEM (Bloomberg-style editorial)
+// ============================================================
+const COMMUNE_COLORS = {
+  "21425": "#fbbf24", // Montbard — GOLD (focus)
+  "21663": "#60a5fa", // Venarey — BLUE
+  "21603": "#34d399", // Semur — GREEN
+  "21154": "#f472b6", // Châtillon — PINK
+};
+
+const BG = "#0a0e1a";
+const PANEL = "#11172a";
+const BORDER = "#1e2642";
+const TEXT = "#e5e7eb";
+const TEXT_DIM = "#6b7280";
+const ACCENT = "#fbbf24";
+
+// ============================================================
+// TYPOGRAPHY (imported via style block — Space Mono + Fraunces)
+// ============================================================
+const FONT_DISPLAY = "'Fraunces', 'Georgia', serif";
+const FONT_MONO = "'JetBrains Mono', 'Courier New', monospace";
+const FONT_SANS = "'Inter Tight', 'Helvetica Neue', sans-serif";
+
+// ============================================================
+// HELPERS
+// ============================================================
+const fmt = (n, digits = 0) =>
+  n == null ? "—" : n.toLocaleString("fr-FR", { maximumFractionDigits: digits });
+
+const fmtPct = (n, digits = 1) =>
+  n == null ? "—" : `${n.toFixed(digits)}%`;
+
+const fmtEur = (n) =>
+  n == null
+    ? "—"
+    : n >= 1e6
+    ? `${(n / 1e6).toFixed(1)} M€`
+    : n >= 1e3
+    ? `${(n / 1e3).toFixed(0)} k€`
+    : `${n} €`;
+
+const computeEvolution = (series, field) => {
+  if (!series || series.length < 2) return 0;
+  const first = series[0][field];
+  const last = series[series.length - 1][field];
+  if (!first) return 0;
+  return ((last - first) / first) * 100;
+};
+
+// ============================================================
+// STYLED PRIMITIVES
+// ============================================================
+const Panel = ({ children, title, subtitle, span = 1, style = {}, padded = true }) => (
+  <div
+    style={{
+      gridColumn: `span ${span}`,
+      background: PANEL,
+      border: `1px solid ${BORDER}`,
+      borderRadius: 2,
+      overflow: "hidden",
+      display: "flex",
+      flexDirection: "column",
+      ...style,
+    }}
+  >
+    {title && (
+      <div
+        style={{
+          padding: "14px 18px 10px",
+          borderBottom: `1px solid ${BORDER}`,
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "baseline",
+        }}
+      >
+        <div>
+          <div
+            style={{
+              fontFamily: FONT_MONO,
+              fontSize: 10,
+              color: ACCENT,
+              letterSpacing: "0.15em",
+              textTransform: "uppercase",
+            }}
+          >
+            {title}
+          </div>
+          {subtitle && (
+            <div
+              style={{
+                fontFamily: FONT_SANS,
+                fontSize: 11,
+                color: TEXT_DIM,
+                marginTop: 2,
+              }}
+            >
+              {subtitle}
+            </div>
+          )}
+        </div>
+      </div>
+    )}
+    <div style={{ padding: padded ? "16px 18px" : 0, flex: 1, display: "flex", flexDirection: "column" }}>
+      {children}
+    </div>
+  </div>
+);
+
+const Kpi = ({ label, value, delta, unit, color = ACCENT }) => (
+  <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+    <span
+      style={{
+        fontFamily: FONT_MONO,
+        fontSize: 9,
+        color: TEXT_DIM,
+        textTransform: "uppercase",
+        letterSpacing: "0.1em",
+      }}
+    >
+      {label}
+    </span>
+    <span
+      style={{
+        fontFamily: FONT_DISPLAY,
+        fontSize: 32,
+        fontWeight: 500,
+        color,
+        lineHeight: 1,
+        letterSpacing: "-0.02em",
+      }}
+    >
+      {value}
+      {unit && (
+        <span style={{ fontSize: 16, color: TEXT_DIM, marginLeft: 4 }}>{unit}</span>
+      )}
+    </span>
+    {delta != null && (
+      <span
+        style={{
+          fontFamily: FONT_MONO,
+          fontSize: 11,
+          color: delta > 0 ? "#34d399" : delta < 0 ? "#f87171" : TEXT_DIM,
+        }}
+      >
+        {delta > 0 ? "▲" : delta < 0 ? "▼" : "—"} {Math.abs(delta).toFixed(1)}%
+      </span>
+    )}
+  </div>
+);
+
+const TooltipStyle = {
+  background: "#0a0e1a",
+  border: `1px solid ${ACCENT}`,
+  borderRadius: 2,
+  padding: "8px 12px",
+  fontFamily: FONT_MONO,
+  fontSize: 11,
+};
+
+// ============================================================
+// SECTIONS
+// ============================================================
+
+function HeroSection() {
+  const pop = DATA.population["21425"].series;
+  const lastPop = pop[pop.length - 1];
+  const firstPop = pop[0];
+  const evol = ((lastPop.value - firstPop.value) / firstPop.value) * 100;
+  const revenus = DATA.revenus["21425"].series;
+  const lastRev = revenus[revenus.length - 1];
+
+  return (
+    <div
+      style={{
+        padding: "48px 40px 36px",
+        borderBottom: `1px solid ${BORDER}`,
+        background: `linear-gradient(180deg, ${BG} 0%, #0d1220 100%)`,
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "baseline", gap: 16, marginBottom: 20 }}>
+        <span
+          style={{
+            fontFamily: FONT_MONO,
+            fontSize: 10,
+            color: ACCENT,
+            letterSpacing: "0.2em",
+          }}
+        >
+          OBSERVATOIRE TERRITORIAL · CÔTE-D'OR (21)
+        </span>
+        <span style={{ color: BORDER }}>▪</span>
+        <span
+          style={{
+            fontFamily: FONT_MONO,
+            fontSize: 10,
+            color: TEXT_DIM,
+            letterSpacing: "0.15em",
+          }}
+        >
+          N° 01 · {new Date().toLocaleDateString("fr-FR", { month: "long", year: "numeric" }).toUpperCase()}
+        </span>
+      </div>
+
+      <h1
+        style={{
+          fontFamily: FONT_DISPLAY,
+          fontSize: 72,
+          fontWeight: 400,
+          color: TEXT,
+          margin: 0,
+          lineHeight: 0.95,
+          letterSpacing: "-0.035em",
+        }}
+      >
+        <em style={{ fontStyle: "italic", color: ACCENT }}>Montbard</em>
+        <span style={{ color: TEXT_DIM }}>,</span>
+        <br />
+        quatre décennies <em style={{ fontStyle: "italic", color: TEXT_DIM }}>en chiffres</em>
+      </h1>
+
+      <p
+        style={{
+          fontFamily: FONT_SANS,
+          fontSize: 16,
+          color: TEXT_DIM,
+          maxWidth: 720,
+          marginTop: 20,
+          lineHeight: 1.55,
+          fontWeight: 300,
+        }}
+      >
+        Une lecture comparée de l'évolution démographique, économique, sociale et politique
+        de la sous-préfecture bourguignonne, mise en regard avec trois communes voisines :
+        Venarey-les-Laumes, Semur-en-Auxois et Châtillon-sur-Seine.
+      </p>
+
+      <div style={{ display: "flex", gap: 48, marginTop: 32, flexWrap: "wrap" }}>
+        <Kpi
+          label="Population 2022"
+          value={fmt(lastPop.value)}
+          delta={evol}
+          color={ACCENT}
+        />
+        <Kpi
+          label={`Depuis ${firstPop.year}`}
+          value={`${evol > 0 ? "+" : ""}${fmt(lastPop.value - firstPop.value)}`}
+          unit="hab."
+          color={evol < 0 ? "#f87171" : "#34d399"}
+        />
+        <Kpi
+          label="Revenu médian"
+          value={fmt(lastRev.median)}
+          unit="€/an"
+        />
+        <Kpi
+          label="Taux de pauvreté"
+          value={fmtPct(lastRev.pauvrete)}
+          color="#f472b6"
+        />
+        <Kpi
+          label="Communes comparées"
+          value="4"
+          unit="+ dept."
+        />
+      </div>
+    </div>
+  );
+}
+
+// -------- POPULATION --------
+function PopulationSection() {
+  const years = Array.from(
+    new Set(
+      Object.values(DATA.population).flatMap((c) => c.series.map((s) => s.year))
+    )
+  ).sort();
+  
+  const chartData = years.map((y) => {
+    const row = { year: y };
+    Object.entries(DATA.population).forEach(([code, info]) => {
+      const pt = info.series.find((s) => s.year === y);
+      if (pt) row[info.commune] = pt.value;
+    });
+    return row;
+  });
+
+  // Indexed: base 100 in 1975
+  const indexedData = chartData.map((row) => {
+    const indexed = { year: row.year };
+    Object.keys(COMMUNE_COLORS).forEach((code) => {
+      const nom = DATA.population[code].commune;
+      const base = DATA.population[code].series.find((s) => s.year === 1975)?.value;
+      if (row[nom] && base) {
+        indexed[nom] = (row[nom] / base) * 100;
+      }
+    });
+    return indexed;
+  });
+
+  return (
+    <Panel title="Population" subtitle="Évolution absolue et indicée depuis 1975 (base 100)" span={3}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, flex: 1 }}>
+        <div>
+          <div style={{ fontFamily: FONT_MONO, fontSize: 10, color: TEXT_DIM, marginBottom: 8 }}>
+            VALEURS ABSOLUES (hab.)
+          </div>
+          <ResponsiveContainer width="100%" height={280}>
+            <LineChart data={chartData} margin={{ top: 5, right: 10, bottom: 5, left: 0 }}>
+              <CartesianGrid stroke={BORDER} strokeDasharray="2 4" vertical={false} />
+              <XAxis dataKey="year" stroke={TEXT_DIM} fontSize={10} fontFamily={FONT_MONO} />
+              <YAxis stroke={TEXT_DIM} fontSize={10} fontFamily={FONT_MONO} />
+              <Tooltip contentStyle={TooltipStyle} />
+              {Object.entries(DATA.population).map(([code, info]) => (
+                <Line
+                  key={code}
+                  type="monotone"
+                  dataKey={info.commune}
+                  stroke={COMMUNE_COLORS[code]}
+                  strokeWidth={code === "21425" ? 3 : 1.5}
+                  dot={{ r: code === "21425" ? 4 : 2 }}
+                />
+              ))}
+              <Legend wrapperStyle={{ fontSize: 10, fontFamily: FONT_MONO }} />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+        <div>
+          <div style={{ fontFamily: FONT_MONO, fontSize: 10, color: TEXT_DIM, marginBottom: 8 }}>
+            BASE 100 = 1975
+          </div>
+          <ResponsiveContainer width="100%" height={280}>
+            <LineChart data={indexedData} margin={{ top: 5, right: 10, bottom: 5, left: 0 }}>
+              <CartesianGrid stroke={BORDER} strokeDasharray="2 4" vertical={false} />
+              <XAxis dataKey="year" stroke={TEXT_DIM} fontSize={10} fontFamily={FONT_MONO} />
+              <YAxis stroke={TEXT_DIM} fontSize={10} fontFamily={FONT_MONO} domain={[50, 110]} />
+              <ReferenceLine y={100} stroke={TEXT_DIM} strokeDasharray="4 4" />
+              <Tooltip contentStyle={TooltipStyle} formatter={(v) => `${v.toFixed(1)}`} />
+              {Object.entries(DATA.population).map(([code, info]) => (
+                <Line
+                  key={code}
+                  type="monotone"
+                  dataKey={info.commune}
+                  stroke={COMMUNE_COLORS[code]}
+                  strokeWidth={code === "21425" ? 3 : 1.5}
+                  dot={false}
+                />
+              ))}
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+      <div
+        style={{
+          marginTop: 16,
+          padding: 12,
+          background: BG,
+          border: `1px solid ${BORDER}`,
+          fontFamily: FONT_SANS,
+          fontSize: 12,
+          color: TEXT_DIM,
+          lineHeight: 1.5,
+        }}
+      >
+        <strong style={{ color: ACCENT, fontFamily: FONT_MONO, fontSize: 10 }}>LECTURE · </strong>
+        Depuis 1975, Montbard a perdu environ 36 % de sa population, une érosion comparable
+        à Châtillon-sur-Seine et plus marquée que Semur-en-Auxois. Ce déclin démographique,
+        typique des sous-préfectures industrielles du nord de la Côte-d'Or, contraste avec
+        la stabilité relative des bourgs à vocation touristique ou tertiaire.
+      </div>
+    </Panel>
+  );
+}
+
+// -------- DEMOGRAPHIE --------
+function PyramideSection() {
+  const pyramide = DATA.demographie["21425"].pyramide_2022;
+  const data = Object.entries(pyramide).map(([tranche, pct]) => ({ tranche, pct }));
+
+  return (
+    <Panel title="Structure par âge" subtitle="Répartition 2022 · Montbard">
+      <ResponsiveContainer width="100%" height={220}>
+        <BarChart data={data} layout="vertical" margin={{ left: 10, right: 20 }}>
+          <XAxis type="number" stroke={TEXT_DIM} fontSize={10} fontFamily={FONT_MONO} />
+          <YAxis dataKey="tranche" type="category" stroke={TEXT_DIM} fontSize={10} fontFamily={FONT_MONO} width={40} />
+          <Tooltip contentStyle={TooltipStyle} formatter={(v) => `${v}%`} />
+          <Bar dataKey="pct" fill={ACCENT}>
+            {data.map((_, i) => (
+              <Cell key={i} fill={`hsl(43, 96%, ${70 - i * 6}%)`} />
+            ))}
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
+    </Panel>
+  );
+}
+
+function NataliteSection() {
+  const chartData = DATA.demographie["21425"].indicateurs.map((r) => ({
+    year: r.year,
+    Natalité: r.taux_natalite,
+    Mortalité: r.taux_mortalite,
+    Solde: r.taux_natalite - r.taux_mortalite,
+  }));
+
+  return (
+    <Panel title="Natalité & mortalité" subtitle="‰ · Montbard 2011-2022" span={2}>
+      <ResponsiveContainer width="100%" height={220}>
+        <ComposedChart data={chartData}>
+          <CartesianGrid stroke={BORDER} strokeDasharray="2 4" vertical={false} />
+          <XAxis dataKey="year" stroke={TEXT_DIM} fontSize={10} fontFamily={FONT_MONO} />
+          <YAxis stroke={TEXT_DIM} fontSize={10} fontFamily={FONT_MONO} />
+          <Tooltip contentStyle={TooltipStyle} />
+          <Legend wrapperStyle={{ fontSize: 10, fontFamily: FONT_MONO }} />
+          <ReferenceLine y={0} stroke={TEXT_DIM} />
+          <Bar dataKey="Natalité" fill="#34d399" />
+          <Bar dataKey="Mortalité" fill="#f87171" />
+          <Line type="monotone" dataKey="Solde" stroke={ACCENT} strokeWidth={2} />
+        </ComposedChart>
+      </ResponsiveContainer>
+    </Panel>
+  );
+}
+
+// -------- REVENUS --------
+function RevenusSection() {
+  const years = DATA.revenus["21425"].series.map((s) => s.year);
+  const chartData = years.map((y) => {
+    const row = { year: y };
+    Object.entries(DATA.revenus).forEach(([code, info]) => {
+      const pt = info.series.find((s) => s.year === y);
+      if (pt) row[info.commune] = pt.median;
+    });
+    return row;
+  });
+
+  return (
+    <Panel title="Revenu médian" subtitle="Revenu disponible médian annuel · source FiLoSoFi" span={2}>
+      <ResponsiveContainer width="100%" height={260}>
+        <LineChart data={chartData}>
+          <CartesianGrid stroke={BORDER} strokeDasharray="2 4" vertical={false} />
+          <XAxis dataKey="year" stroke={TEXT_DIM} fontSize={10} fontFamily={FONT_MONO} />
+          <YAxis stroke={TEXT_DIM} fontSize={10} fontFamily={FONT_MONO}
+                 tickFormatter={(v) => `${(v / 1000).toFixed(0)}k€`} />
+          <Tooltip contentStyle={TooltipStyle} formatter={(v) => fmtEur(v)} />
+          <Legend wrapperStyle={{ fontSize: 10, fontFamily: FONT_MONO }} />
+          {Object.entries(DATA.revenus).map(([code, info]) => (
+            <Line
+              key={code}
+              type="monotone"
+              dataKey={info.commune}
+              stroke={COMMUNE_COLORS[code]}
+              strokeWidth={code === "21425" ? 2.5 : 1.5}
+              dot={{ r: code === "21425" ? 3 : 2 }}
+            />
+          ))}
+        </LineChart>
+      </ResponsiveContainer>
+    </Panel>
+  );
+}
+
+function PauvreteSection() {
+  const years = DATA.revenus["21425"].series.map((s) => s.year);
+  const chartData = years.map((y) => {
+    const row = { year: y };
+    Object.entries(DATA.revenus).forEach(([code, info]) => {
+      const pt = info.series.find((s) => s.year === y);
+      if (pt) row[info.commune] = pt.pauvrete;
+    });
+    return row;
+  });
+
+  return (
+    <Panel title="Taux de pauvreté" subtitle="% · seuil monétaire à 60% du revenu médian">
+      <ResponsiveContainer width="100%" height={260}>
+        <BarChart data={chartData} barGap={2}>
+          <CartesianGrid stroke={BORDER} strokeDasharray="2 4" vertical={false} />
+          <XAxis dataKey="year" stroke={TEXT_DIM} fontSize={10} fontFamily={FONT_MONO} />
+          <YAxis stroke={TEXT_DIM} fontSize={10} fontFamily={FONT_MONO} />
+          <Tooltip contentStyle={TooltipStyle} formatter={(v) => fmtPct(v)} />
+          {Object.entries(DATA.revenus).map(([code, info]) => (
+            <Bar key={code} dataKey={info.commune} fill={COMMUNE_COLORS[code]} />
+          ))}
+        </BarChart>
+      </ResponsiveContainer>
+    </Panel>
+  );
+}
+
+// -------- EMPLOI --------
+function EmploiSection() {
+  const chartData = DATA.emploi["21425"].series.map((s) => ({
+    year: s.year,
+    Emploi: s.emploi_salarie,
+    Chômage: s.chomage_ze,
+  }));
+
+  return (
+    <Panel title="Emploi & chômage" subtitle="Emploi salarié local + taux de chômage zone d'emploi" span={2}>
+      <ResponsiveContainer width="100%" height={260}>
+        <ComposedChart data={chartData}>
+          <CartesianGrid stroke={BORDER} strokeDasharray="2 4" vertical={false} />
+          <XAxis dataKey="year" stroke={TEXT_DIM} fontSize={10} fontFamily={FONT_MONO} />
+          <YAxis yAxisId="left" stroke="#60a5fa" fontSize={10} fontFamily={FONT_MONO} />
+          <YAxis yAxisId="right" orientation="right" stroke="#f87171" fontSize={10} fontFamily={FONT_MONO} />
+          <Tooltip contentStyle={TooltipStyle} />
+          <Legend wrapperStyle={{ fontSize: 10, fontFamily: FONT_MONO }} />
+          <Bar yAxisId="left" dataKey="Emploi" fill="#60a5fa" opacity={0.7} />
+          <Line yAxisId="right" type="monotone" dataKey="Chômage" stroke="#f87171" strokeWidth={2.5} dot={{ r: 3 }} />
+        </ComposedChart>
+      </ResponsiveContainer>
+    </Panel>
+  );
+}
+
+// -------- LOGEMENT --------
+function LogementSection() {
+  const chartData = DATA.logement["21425"].series.map((s) => ({
+    year: s.year,
+    Principales: s.principales,
+    Vacants: s.vacants,
+    Secondaires: s.secondaires,
+    pct_vacants: (s.vacants / s.total) * 100,
+  }));
+
+  return (
+    <Panel title="Parc de logements" subtitle="Composition · Montbard 1999-2022">
+      <ResponsiveContainer width="100%" height={220}>
+        <AreaChart data={chartData}>
+          <CartesianGrid stroke={BORDER} strokeDasharray="2 4" vertical={false} />
+          <XAxis dataKey="year" stroke={TEXT_DIM} fontSize={10} fontFamily={FONT_MONO} />
+          <YAxis stroke={TEXT_DIM} fontSize={10} fontFamily={FONT_MONO} />
+          <Tooltip contentStyle={TooltipStyle} />
+          <Legend wrapperStyle={{ fontSize: 10, fontFamily: FONT_MONO }} />
+          <Area type="monotone" dataKey="Principales" stackId="1" stroke="#34d399" fill="#34d39944" />
+          <Area type="monotone" dataKey="Vacants" stackId="1" stroke="#f87171" fill="#f8717144" />
+          <Area type="monotone" dataKey="Secondaires" stackId="1" stroke="#a78bfa" fill="#a78bfa44" />
+        </AreaChart>
+      </ResponsiveContainer>
+    </Panel>
+  );
+}
+
+function VacanceComparativeSection() {
+  const chartData = Object.entries(DATA.logement).map(([code, info]) => {
+    const last = info.series[info.series.length - 1];
+    const first = info.series[0];
+    return {
+      commune: info.commune,
+      "1999": (first.vacants / first.total) * 100,
+      "2022": (last.vacants / last.total) * 100,
+    };
+  });
+
+  return (
+    <Panel title="Vacance : 1999 vs 2022" subtitle="% logements vacants">
+      <ResponsiveContainer width="100%" height={220}>
+        <BarChart data={chartData}>
+          <CartesianGrid stroke={BORDER} strokeDasharray="2 4" vertical={false} />
+          <XAxis dataKey="commune" stroke={TEXT_DIM} fontSize={9} fontFamily={FONT_MONO} />
+          <YAxis stroke={TEXT_DIM} fontSize={10} fontFamily={FONT_MONO} tickFormatter={(v) => `${v}%`} />
+          <Tooltip contentStyle={TooltipStyle} formatter={(v) => fmtPct(v)} />
+          <Legend wrapperStyle={{ fontSize: 10, fontFamily: FONT_MONO }} />
+          <Bar dataKey="1999" fill="#475569" />
+          <Bar dataKey="2022" fill="#f87171" />
+        </BarChart>
+      </ResponsiveContainer>
+    </Panel>
+  );
+}
+
+// -------- ENTREPRISES --------
+function EntreprisesSection() {
+  const chartData = DATA.entreprises["21425"].series.map((s) => ({
+    year: s.year,
+    Industrie: s.industrie,
+    Commerce: s.commerce,
+    Services: s.services,
+  }));
+
+  return (
+    <Panel title="Tissu économique" subtitle="Entreprises actives par secteur · Montbard" span={2}>
+      <ResponsiveContainer width="100%" height={220}>
+        <AreaChart data={chartData}>
+          <CartesianGrid stroke={BORDER} strokeDasharray="2 4" vertical={false} />
+          <XAxis dataKey="year" stroke={TEXT_DIM} fontSize={10} fontFamily={FONT_MONO} />
+          <YAxis stroke={TEXT_DIM} fontSize={10} fontFamily={FONT_MONO} />
+          <Tooltip contentStyle={TooltipStyle} />
+          <Legend wrapperStyle={{ fontSize: 10, fontFamily: FONT_MONO }} />
+          <Area type="monotone" dataKey="Industrie" stackId="1" stroke="#ef4444" fill="#ef444466" />
+          <Area type="monotone" dataKey="Commerce" stackId="1" stroke="#fbbf24" fill="#fbbf2466" />
+          <Area type="monotone" dataKey="Services" stackId="1" stroke="#60a5fa" fill="#60a5fa66" />
+        </AreaChart>
+      </ResponsiveContainer>
+    </Panel>
+  );
+}
+
+function CreationsSection() {
+  const chartData = DATA.entreprises["21425"].series.map((s) => {
+    const row = { year: s.year };
+    Object.entries(DATA.entreprises).forEach(([code, info]) => {
+      const pt = info.series.find((p) => p.year === s.year);
+      if (pt) row[info.commune] = pt.creations;
+    });
+    return row;
+  });
+
+  return (
+    <Panel title="Créations d'entreprises" subtitle="Nouvelles immatriculations annuelles">
+      <ResponsiveContainer width="100%" height={220}>
+        <LineChart data={chartData}>
+          <CartesianGrid stroke={BORDER} strokeDasharray="2 4" vertical={false} />
+          <XAxis dataKey="year" stroke={TEXT_DIM} fontSize={10} fontFamily={FONT_MONO} />
+          <YAxis stroke={TEXT_DIM} fontSize={10} fontFamily={FONT_MONO} />
+          <Tooltip contentStyle={TooltipStyle} />
+          {Object.entries(DATA.entreprises).map(([code, info]) => (
+            <Line
+              key={code}
+              type="monotone"
+              dataKey={info.commune}
+              stroke={COMMUNE_COLORS[code]}
+              strokeWidth={code === "21425" ? 2.5 : 1.5}
+              dot={{ r: code === "21425" ? 3 : 2 }}
+            />
+          ))}
+        </LineChart>
+      </ResponsiveContainer>
+    </Panel>
+  );
+}
+
+// -------- FINANCES --------
+function FinancesSection() {
+  const series = DATA.finances["21425"].series;
+  const chartData = series.map((s) => ({
+    year: s.year,
+    "Recettes": Math.round(s.recettes_fonct / 1000),
+    "Dépenses": Math.round(s.depenses_fonct / 1000),
+    "Épargne brute": Math.round(s.epargne_brute / 1000),
+  }));
+
+  return (
+    <Panel title="Budget de fonctionnement" subtitle="Milliers d'€ · Montbard 2012-2024" span={2}>
+      <ResponsiveContainer width="100%" height={240}>
+        <ComposedChart data={chartData}>
+          <CartesianGrid stroke={BORDER} strokeDasharray="2 4" vertical={false} />
+          <XAxis dataKey="year" stroke={TEXT_DIM} fontSize={10} fontFamily={FONT_MONO} />
+          <YAxis stroke={TEXT_DIM} fontSize={10} fontFamily={FONT_MONO}
+                 tickFormatter={(v) => `${v >= 1000 ? (v/1000).toFixed(1) + 'M' : v + 'k'}`} />
+          <Tooltip contentStyle={TooltipStyle} formatter={(v) => `${v} k€`} />
+          <Legend wrapperStyle={{ fontSize: 10, fontFamily: FONT_MONO }} />
+          <Bar dataKey="Recettes" fill="#34d399" opacity={0.7} />
+          <Bar dataKey="Dépenses" fill="#f87171" opacity={0.7} />
+          <Line type="monotone" dataKey="Épargne brute" stroke={ACCENT} strokeWidth={2.5} />
+        </ComposedChart>
+      </ResponsiveContainer>
+    </Panel>
+  );
+}
+
+function DetteSection() {
+  const chartData = DATA.finances["21425"].series.map((s) => ({
+    year: s.year,
+    "Dette/hab (€)": Math.round(s.dette / s.pop_dgf),
+  }));
+
+  return (
+    <Panel title="Dette par habitant" subtitle="€ par habitant · Montbard">
+      <ResponsiveContainer width="100%" height={240}>
+        <AreaChart data={chartData}>
+          <CartesianGrid stroke={BORDER} strokeDasharray="2 4" vertical={false} />
+          <XAxis dataKey="year" stroke={TEXT_DIM} fontSize={10} fontFamily={FONT_MONO} />
+          <YAxis stroke={TEXT_DIM} fontSize={10} fontFamily={FONT_MONO} />
+          <Tooltip contentStyle={TooltipStyle} formatter={(v) => `${v} €`} />
+          <Area type="monotone" dataKey="Dette/hab (€)" stroke="#f87171" fill="#f8717144" strokeWidth={2} />
+        </AreaChart>
+      </ResponsiveContainer>
+    </Panel>
+  );
+}
+
+// -------- POLITIQUE --------
+function ElectionsSection() {
+  const years = [2002, 2007, 2012, 2017, 2022];
+  const chartData = years.map((y) => {
+    const row = { year: y };
+    Object.entries(DATA.elections).forEach(([code, info]) => {
+      const scrutin = info.presidentielle_t2[y];
+      if (scrutin) {
+        // Take the first candidate (droite or gauche selon année)
+        const keys = Object.keys(scrutin).filter(k => k !== "abstention");
+        // Separate left/right candidates
+        const left = keys.find(k => /PS|LREM|Socialist|Royal|Hollande|Macron/.test(k));
+        const right = keys.find(k => /RPR|UMP|FN|RN|Chirac|Sarkozy|Le Pen/.test(k));
+        // Take the "non-RN/non-FN" as "gauche/centre"
+        const nonRN = keys.find(k => !/FN|RN|Le Pen/.test(k));
+        row[info.commune] = scrutin[nonRN] || 0;
+      }
+    });
+    return row;
+  });
+
+  return (
+    <Panel title="Élections présidentielles — 2e tour" 
+           subtitle="% pour le candidat non-FN/RN · 2002 Chirac, 2007 Royal, 2012 Hollande, 2017-22 Macron"
+           span={2}>
+      <ResponsiveContainer width="100%" height={240}>
+        <LineChart data={chartData}>
+          <CartesianGrid stroke={BORDER} strokeDasharray="2 4" vertical={false} />
+          <XAxis dataKey="year" stroke={TEXT_DIM} fontSize={10} fontFamily={FONT_MONO} />
+          <YAxis stroke={TEXT_DIM} fontSize={10} fontFamily={FONT_MONO} domain={[30, 90]}
+                 tickFormatter={(v) => `${v}%`} />
+          <Tooltip contentStyle={TooltipStyle} formatter={(v) => fmtPct(v)} />
+          <Legend wrapperStyle={{ fontSize: 10, fontFamily: FONT_MONO }} />
+          <ReferenceLine y={50} stroke={TEXT_DIM} strokeDasharray="4 4" />
+          {Object.entries(DATA.elections).map(([code, info]) => (
+            <Line
+              key={code}
+              type="monotone"
+              dataKey={info.commune}
+              stroke={COMMUNE_COLORS[code]}
+              strokeWidth={code === "21425" ? 3 : 1.5}
+              dot={{ r: code === "21425" ? 4 : 3 }}
+            />
+          ))}
+        </LineChart>
+      </ResponsiveContainer>
+    </Panel>
+  );
+}
+
+function AbstentionSection() {
+  const years = [2002, 2007, 2012, 2017, 2022];
+  const chartData = years.map((y) => {
+    const row = { year: y };
+    Object.entries(DATA.elections).forEach(([code, info]) => {
+      const scrutin = info.presidentielle_t2[y];
+      if (scrutin) row[info.commune] = scrutin.abstention;
+    });
+    return row;
+  });
+
+  return (
+    <Panel title="Abstention" subtitle="% inscrits · 2e tour présidentielles">
+      <ResponsiveContainer width="100%" height={240}>
+        <BarChart data={chartData} barGap={2}>
+          <CartesianGrid stroke={BORDER} strokeDasharray="2 4" vertical={false} />
+          <XAxis dataKey="year" stroke={TEXT_DIM} fontSize={10} fontFamily={FONT_MONO} />
+          <YAxis stroke={TEXT_DIM} fontSize={10} fontFamily={FONT_MONO} tickFormatter={(v) => `${v}%`} />
+          <Tooltip contentStyle={TooltipStyle} formatter={(v) => fmtPct(v)} />
+          {Object.entries(DATA.elections).map(([code, info]) => (
+            <Bar key={code} dataKey={info.commune} fill={COMMUNE_COLORS[code]} />
+          ))}
+        </BarChart>
+      </ResponsiveContainer>
+    </Panel>
+  );
+}
+
+function PoliticalShiftSection() {
+  // For Montbard, show the vote share for RN/FN over time
+  const years = [2002, 2007, 2012, 2017, 2022];
+  const chartData = years.map((y) => {
+    const scrutin = DATA.elections["21425"].presidentielle_t2[y];
+    const rn = Object.entries(scrutin).find(([k]) => /FN|RN|Le Pen/.test(k));
+    return {
+      year: y,
+      "Extrême droite": rn ? rn[1] : 0,
+    };
+  });
+
+  return (
+    <Panel title="Bascule politique · Montbard" subtitle="Part du vote FN/RN au 2e tour présidentielle">
+      <ResponsiveContainer width="100%" height={240}>
+        <AreaChart data={chartData}>
+          <defs>
+            <linearGradient id="rnGradient" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#ef4444" stopOpacity={0.8} />
+              <stop offset="100%" stopColor="#ef4444" stopOpacity={0.1} />
+            </linearGradient>
+          </defs>
+          <CartesianGrid stroke={BORDER} strokeDasharray="2 4" vertical={false} />
+          <XAxis dataKey="year" stroke={TEXT_DIM} fontSize={10} fontFamily={FONT_MONO} />
+          <YAxis stroke={TEXT_DIM} fontSize={10} fontFamily={FONT_MONO} domain={[0, 60]}
+                 tickFormatter={(v) => `${v}%`} />
+          <Tooltip contentStyle={TooltipStyle} formatter={(v) => fmtPct(v)} />
+          <Area type="monotone" dataKey="Extrême droite" stroke="#ef4444" fill="url(#rnGradient)" strokeWidth={3} />
+        </AreaChart>
+      </ResponsiveContainer>
+    </Panel>
+  );
+}
+
+// -------- SYNTHESE --------
+function SynthesePanel() {
+  const pop = DATA.population["21425"].series;
+  const popEvol = ((pop[pop.length - 1].value - pop[0].value) / pop[0].value) * 100;
+  
+  const rev = DATA.revenus["21425"].series;
+  const revEvol = ((rev[rev.length - 1].median - rev[0].median) / rev[0].median) * 100;
+  
+  const emp = DATA.emploi["21425"].series;
+  const empEvol = ((emp[emp.length - 1].emploi_salarie - emp[0].emploi_salarie) / emp[0].emploi_salarie) * 100;
+  
+  const fin = DATA.finances["21425"].series;
+  const detteHab = fin[fin.length - 1].dette / fin[fin.length - 1].pop_dgf;
+  
+  const rnLast = DATA.elections["21425"].presidentielle_t2[2022];
+  const rnKey = Object.keys(rnLast).find(k => /RN|Le Pen/.test(k));
+  const rnShare = rnLast[rnKey];
+
+  const indicators = [
+    { label: "Population", value: `${popEvol.toFixed(1)}%`, sub: `depuis ${pop[0].year}`, color: popEvol < 0 ? "#f87171" : "#34d399" },
+    { label: "Revenu médian", value: `+${revEvol.toFixed(1)}%`, sub: `depuis ${rev[0].year}`, color: "#34d399" },
+    { label: "Emploi salarié", value: `${empEvol > 0 ? "+" : ""}${empEvol.toFixed(1)}%`, sub: `depuis ${emp[0].year}`, color: empEvol < 0 ? "#f87171" : "#34d399" },
+    { label: "Dette par hab.", value: fmt(detteHab), sub: "en 2024", unit: "€", color: ACCENT },
+    { label: "Vote RN 2022", value: fmtPct(rnShare), sub: "2ᵉ tour", color: "#ef4444" },
+  ];
+
+  return (
+    <Panel title="Montbard en 5 chiffres" subtitle="Synthèse 1975-2024" span={3}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 16 }}>
+        {indicators.map((ind, i) => (
+          <div key={i} style={{ padding: "12px 0", borderRight: i < 4 ? `1px solid ${BORDER}` : "none", paddingLeft: i === 0 ? 0 : 16 }}>
+            <div style={{ fontFamily: FONT_MONO, fontSize: 9, color: TEXT_DIM, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 6 }}>
+              {ind.label}
+            </div>
+            <div style={{ fontFamily: FONT_DISPLAY, fontSize: 40, color: ind.color, lineHeight: 1, letterSpacing: "-0.03em" }}>
+              {ind.value}
+              {ind.unit && <span style={{ fontSize: 20, color: TEXT_DIM, marginLeft: 2 }}>{ind.unit}</span>}
+            </div>
+            <div style={{ fontFamily: FONT_SANS, fontSize: 11, color: TEXT_DIM, marginTop: 4, fontStyle: "italic" }}>
+              {ind.sub}
+            </div>
+          </div>
+        ))}
+      </div>
+    </Panel>
+  );
+}
+
+// -------- FOOTER --------
+function Footer() {
+  return (
+    <div style={{ padding: "32px 40px", borderTop: `1px solid ${BORDER}`, fontFamily: FONT_SANS, fontSize: 11, color: TEXT_DIM }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: 24 }}>
+        <div>
+          <div style={{ fontFamily: FONT_MONO, fontSize: 10, color: ACCENT, letterSpacing: "0.15em", marginBottom: 8 }}>SOURCES</div>
+          <div style={{ lineHeight: 1.7 }}>
+            INSEE (Recensements, FiLoSoFi, FLORES, SIRENE) · OFGL (Finances locales) ·<br />
+            Ministère de l'Intérieur (Élections) · data.gouv.fr
+          </div>
+        </div>
+        <div style={{ textAlign: "right" }}>
+          <div style={{ fontFamily: FONT_MONO, fontSize: 10, color: ACCENT, letterSpacing: "0.15em", marginBottom: 8 }}>NOTE MÉTHODOLOGIQUE</div>
+          <div style={{ lineHeight: 1.7, maxWidth: 380 }}>
+            Millésimes disponibles variables selon les sources.<br />
+            Données collectées via le script <code style={{ background: PANEL, padding: "1px 6px", fontSize: 10 }}>collect_data.py</code>.
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// MAIN
+// ============================================================
+function Dashboard() {
+  return (
+    <div style={{
+      background: BG,
+      minHeight: "100vh",
+      color: TEXT,
+      fontFamily: FONT_SANS,
+    }}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300..900;1,300..900&family=Inter+Tight:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+        * { box-sizing: border-box; }
+        body { margin: 0; }
+      `}</style>
+
+      <HeroSection />
+
+      <div style={{
+        padding: "24px 40px",
+        display: "grid",
+        gridTemplateColumns: "repeat(3, 1fr)",
+        gap: 16,
+      }}>
+        <SynthesePanel />
+        
+        <SectionHeader label="DÉMOGRAPHIE" />
+        <PopulationSection />
+        <PyramideSection />
+        <NataliteSection />
+        
+        <SectionHeader label="REVENUS & CONDITIONS DE VIE" />
+        <RevenusSection />
+        <PauvreteSection />
+        
+        <SectionHeader label="ÉCONOMIE & EMPLOI" />
+        <EmploiSection />
+        <CreationsSection />
+        <EntreprisesSection />
+        
+        <SectionHeader label="LOGEMENT" />
+        <LogementSection />
+        <VacanceComparativeSection />
+        
+        <SectionHeader label="FINANCES LOCALES" />
+        <FinancesSection />
+        <DetteSection />
+        
+        <SectionHeader label="POLITIQUE" />
+        <ElectionsSection />
+        <PoliticalShiftSection />
+        <AbstentionSection />
+      </div>
+
+      <Footer />
+    </div>
+  );
+}
+
+function SectionHeader({ label }) {
+  return (
+    <div style={{
+      gridColumn: "span 3",
+      marginTop: 20,
+      paddingBottom: 8,
+      borderBottom: `2px solid ${ACCENT}`,
+      fontFamily: FONT_MONO,
+      fontSize: 11,
+      color: ACCENT,
+      letterSpacing: "0.25em",
+      fontWeight: 500,
+    }}>
+      § {label}
+    </div>
+  );
+}
+
+
+    // Mount
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<Dashboard />);
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('root').style.display = 'block';
+  </script>
+</body>
+</html>
