@@ -4,10 +4,6 @@
 # Cache local du script Python
 .cache/
 
-# Données brutes (régénérées par collect_data.py)
-# Commenter cette ligne si tu veux versionner data.json
-data.json
-
 # Python
 __pycache__/
 *.pyc
@@ -17,3 +13,6 @@ __pycache__/
 node_modules/
 dist/
 .DS_Store
+
+# data.json est intentionnellement commité pour GitHub Pages
+# Pour le régénérer : python3 collect_data.py
