@@ -1,0 +1,19 @@
+# Secrets — ne jamais committer
+.env
+
+# Cache local du script Python
+.cache/
+
+# Données brutes (régénérées par collect_data.py)
+# Commenter cette ligne si tu veux versionner data.json
+data.json
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Node / build
+node_modules/
+dist/
+.DS_Store
