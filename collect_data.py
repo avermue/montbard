@@ -391,64 +391,102 @@ def collect_elections() -> dict:
 
 def collect_finances_ofgl() -> dict:
     """
-    Finances communales via l'API Opendatasoft de l'OFGL.
-    Données : 2012-2024 (les plus récentes exposées).
+    Finances communales via l'API OFGL (format long : 1 ligne par agrégat).
+    On pagine tout puis on pivote sur les agrégats utiles.
+
+    Agrégats retenus (noms exacts OFGL) :
+      - "Recettes de fonctionnement"   → recettes_fonct
+      - "Dépenses de fonctionnement"   → depenses_fonct
+      - "Epargne brute"                → epargne_brute
+      - "Encours de dette"             → dette
+      - "Dépenses d'équipement"        → equipement
+    Population : champ ptot_n de n'importe quel enregistrement de l'année.
     """
-    log("Collecte OFGL : finances communales…")
-    
+    log("Collecte OFGL : finances communales (pagination + pivot)…")
+
     base_url = "https://data.ofgl.fr/api/explore/v2.1/catalog/datasets/ofgl-base-communes/records"
-    
+
+    # Agrégats à extraire → clé dans notre JSON
+    AGREGATS = {
+        "Recettes de fonctionnement":  "recettes_fonct",
+        "Dépenses de fonctionnement":  "depenses_fonct",
+        "Epargne brute":               "epargne_brute",
+        "Encours de dette":            "dette",
+        "Dépenses d'équipement":       "equipement",
+    }
+
     results = {}
     for code, info in COMMUNES.items():
-        # L'API OFGL utilise le code INSEE commune sur 5 chiffres
-        data = fetch_json(
-            base_url,
-            params={
-                "where": f'insee="{code}"',
-                "limit": 100,
-                "order_by": "exer",
-            },
-            sleep=0.5,
-        )
-        
-        if data and "results" in data:
-            series = []
-            for record in data["results"]:
-                # Les champs standard OFGL
-                year = record.get("exer")
-                if not year:
-                    continue
-                try:
-                    entry = {
-                        "year": int(year),
-                        # Recettes réelles de fonctionnement
-                        "recettes_fonct": _safe_float(record.get("rrf")),
-                        # Dépenses réelles de fonctionnement
-                        "depenses_fonct": _safe_float(record.get("drf")),
-                        # Épargne brute
-                        "epargne_brute": _safe_float(record.get("epb")),
-                        # Encours de dette
-                        "dette": _safe_float(record.get("encours_dette")),
-                        # Dépenses d'équipement
-                        "equipement": _safe_float(record.get("depenses_equipement")),
-                        # Population DGF (pour calculs par habitant)
-                        "pop_dgf": _safe_float(record.get("pop_dgf")),
-                    }
-                    series.append(entry)
-                except (ValueError, TypeError):
-                    pass
-            series.sort(key=lambda x: x["year"])
-            results[code] = {"commune": info["nom"], "series": series}
-            log(f"  {info['nom']:25s}: {len(series)} exercices", "OK")
-        else:
-            log(f"  {info['nom']}: indisponible → fallback", "WARN")
+        # Pagination complète
+        all_records = []
+        offset = 0
+        total = None
+        while total is None or len(all_records) < total:
+            data = fetch_json(
+                base_url,
+                params={
+                    "where": f'insee="{code}"',
+                    "limit": 100,
+                    "offset": offset,
+                    "select": "agregat,exer,montant,ptot_n",
+                    "order_by": "exer",
+                },
+                sleep=0.3,
+            )
+            if not data or "results" not in data:
+                break
+            total = data.get("total_count", 0)
+            all_records.extend(data["results"])
+            offset += 100
+            if offset > total:
+                break
+
+        if not all_records:
+            log(f"  {info['nom']}: aucun enregistrement → fallback", "WARN")
             results[code] = {"commune": info["nom"], "series": []}
-    
-    # Si rien n'a été récupéré, on produit des données estimées (à documenter comme fallback)
+            continue
+
+        # Pivot : {year: {champ: valeur}}
+        pivot = {}
+        for rec in all_records:
+            year = rec.get("exer")
+            agregat = rec.get("agregat", "")
+            montant = _safe_float(rec.get("montant"))
+            ptot_n = _safe_float(rec.get("ptot_n"))
+            if not year:
+                continue
+            year = int(year)
+            if year not in pivot:
+                pivot[year] = {"pop_dgf": None}
+            if ptot_n and pivot[year]["pop_dgf"] is None:
+                pivot[year]["pop_dgf"] = ptot_n
+            if agregat in AGREGATS:
+                pivot[year][AGREGATS[agregat]] = montant
+
+        # Convertir en liste triée, ne garder que les années complètes
+        series = []
+        for year in sorted(pivot.keys()):
+            row = pivot[year]
+            entry = {
+                "year": year,
+                "recettes_fonct": row.get("recettes_fonct"),
+                "depenses_fonct":  row.get("depenses_fonct"),
+                "epargne_brute":   row.get("epargne_brute"),
+                "dette":           row.get("dette"),
+                "equipement":      row.get("equipement"),
+                "pop_dgf":         row.get("pop_dgf"),
+            }
+            # N'inclure que si au moins les recettes sont présentes
+            if entry["recettes_fonct"] is not None:
+                series.append(entry)
+
+        results[code] = {"commune": info["nom"], "series": series}
+        log(f"  {info['nom']:25s}: {len(series)} années · {len(all_records)} enreg. OFGL", "OK")
+
     if all(len(r["series"]) == 0 for r in results.values()):
         log("  Aucune donnée OFGL récupérée → fallback intégré", "WARN")
         return collect_finances_builtin()
-    
+
     return results
 
 
