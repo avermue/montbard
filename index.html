@@ -156,31 +156,56 @@
     </div>
 
     <div class="section-header">§ FINANCES LOCALES</div>
-    <div class="panel grid-half">
-      <div class="panel-header"><div class="panel-title">Budget de fonctionnement</div><div class="panel-sub">Milliers d'€ · Montbard 2012–2024 · source OFGL</div></div>
-      <div class="panel-body"><div class="chart-wrap"><canvas id="chart-budget"></canvas></div></div>
-    </div>
-    <div class="panel">
-      <div class="panel-header"><div class="panel-title">Dette par habitant</div><div class="panel-sub">€/hab · Montbard 2012–2024</div></div>
-      <div class="panel-body"><div class="chart-wrap"><canvas id="chart-dette"></canvas></div></div>
+
+    <div class="panel grid-full">
+      <div class="panel-header"><div class="panel-title">Budget de fonctionnement</div><div class="panel-sub">€ · Recettes, dépenses et épargne brute · Montbard 2017–2024 · source OFGL</div></div>
+      <div class="panel-body"><div class="chart-wrap" style="min-height:240px"><canvas id="chart-budget"></canvas></div></div>
     </div>
 
-    <div class="section-header">§ POLITIQUE</div>
-    <div class="panel grid-half">
-      <div class="panel-header"><div class="panel-title">Présidentielles — 2e tour (candidat non-RN)</div><div class="panel-sub">% · 2002 Chirac · 2007 Royal · 2012 Hollande · 2017–22 Macron</div></div>
-      <div class="panel-body"><div class="chart-wrap"><canvas id="chart-elections"></canvas></div></div>
+    <div class="panel">
+      <div class="panel-header"><div class="panel-title">Encours de dette</div><div class="panel-sub">€ total · Montbard 2017–2024</div></div>
+      <div class="panel-body"><div class="chart-wrap"><canvas id="chart-dette-abs"></canvas></div></div>
     </div>
     <div class="panel">
-      <div class="panel-header"><div class="panel-title">Montée du vote RN · Montbard</div><div class="panel-sub">% vote FN/RN au 2e tour présidentielle</div></div>
+      <div class="panel-header"><div class="panel-title">Dette par habitant</div><div class="panel-sub">€/hab · comparaison 4 communes</div></div>
+      <div class="panel-body"><div class="chart-wrap"><canvas id="chart-dette-hab"></canvas></div></div>
+    </div>
+    <div class="panel">
+      <div class="panel-header"><div class="panel-title">Annuité de la dette</div><div class="panel-sub">€ · remboursement annuel capital+intérêts</div></div>
+      <div class="panel-body"><div class="chart-wrap"><canvas id="chart-annuite"></canvas></div></div>
+    </div>
+
+    <div class="panel grid-half">
+      <div class="panel-header"><div class="panel-title">Dépenses d'investissement</div><div class="panel-sub">€ · comparaison 4 communes 2017–2024</div></div>
+      <div class="panel-body"><div class="chart-wrap"><canvas id="chart-invest"></canvas></div></div>
+    </div>
+    <div class="panel">
+      <div class="panel-header"><div class="panel-title">Dépenses d'équipement / habitant</div><div class="panel-sub">€/hab · effort d'investissement comparé</div></div>
+      <div class="panel-body"><div class="chart-wrap"><canvas id="chart-equipement-hab"></canvas></div></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header"><div class="panel-title">Impôts locaux</div><div class="panel-sub">€ · Montbard 2017–2024</div></div>
+      <div class="panel-body"><div class="chart-wrap"><canvas id="chart-impots"></canvas></div></div>
+    </div>
+    <div class="panel">
+      <div class="panel-header"><div class="panel-title">Impôts locaux / habitant</div><div class="panel-sub">€/hab · pression fiscale comparée</div></div>
+      <div class="panel-body"><div class="chart-wrap"><canvas id="chart-impots-hab"></canvas></div></div>
+    </div>
+    <div class="panel">
+      <div class="panel-header"><div class="panel-title">Frais de personnel</div><div class="panel-sub">% des dépenses de fonctionnement · comparaison</div></div>
       <div class="panel-body">
-        <div class="chart-wrap"><canvas id="chart-rn"></canvas></div>
-        <div class="reading-note"><strong>Lecture · </strong>Le vote FN/RN à Montbard est passé de 22% en 2002 à 45% en 2022, suivant la désindustrialisation et le recul des services publics.</div>
+        <div class="chart-wrap"><canvas id="chart-personnel"></canvas></div>
+        <div class="reading-note"><strong>Lecture · </strong>Le ratio frais de personnel / dépenses de fonctionnement mesure le poids des charges de structure. Un ratio élevé laisse peu de marges de manœuvre budgétaire.</div>
       </div>
     </div>
+
     <div class="panel grid-full">
-      <div class="panel-header"><div class="panel-title">Abstention au 2e tour des présidentielles</div><div class="panel-sub">% des inscrits · comparaison entre communes</div></div>
-      <div class="panel-body"><div class="chart-wrap" style="min-height:200px"><canvas id="chart-abstention"></canvas></div></div>
+      <div class="panel-header"><div class="panel-title">Épargne brute par habitant</div><div class="panel-sub">€/hab · capacité d'autofinancement comparée · 2017–2024</div></div>
+      <div class="panel-body"><div class="chart-wrap" style="min-height:220px"><canvas id="chart-epargne-hab"></canvas></div></div>
     </div>
+
+
   </div>
 
   <div class="footer">
@@ -224,26 +249,27 @@ function build(D){
   const pEvol=((pL.value-pF.value)/pF.value)*100;
   const rev=D.revenus["21425"].series;
   const rL=rev[rev.length-1];
-  const elec=D.elections["21425"].presidentielle_t2;
-  const rnK=Object.keys(elec[2022]).find(k=>/RN|Le Pen/.test(k));
+  const finLast=D.finances["21425"].series[D.finances["21425"].series.length-1];
+  const detteHab=finLast&&finLast.pop_dgf?Math.round(finLast.dette/finLast.pop_dgf):null;
   document.getElementById("kpi-row").innerHTML=[
     {label:"Population 2022",value:fmt(pL.value),unit:"hab.",delta:pEvol,color:"#fbbf24"},
     {label:`Depuis ${pF.year}`,value:`${pEvol>0?"+":""}${fmt(pL.value-pF.value)}`,unit:"hab.",color:pEvol<0?"#f87171":"#34d399"},
     {label:"Revenu médian",value:fmt(rL.median),unit:"€/an",color:"#fbbf24"},
     {label:"Taux de pauvreté",value:fmtPct(rL.pauvrete),color:"#f472b6"},
-    {label:"Vote RN 2022",value:fmtPct(elec[2022][rnK]),color:"#f87171"},
+    {label:"Dette / habitant",value:fmt(detteHab),unit:"€",color:"#f87171"},
   ].map(k=>`<div class="kpi"><div class="kpi-label">${k.label}</div><div class="kpi-value" style="color:${k.color}">${k.value}${k.unit?`<span class="unit">${k.unit}</span>`:""}</div>${k.delta!=null?`<div class="kpi-delta ${k.delta<0?"delta-neg":"delta-pos"}">${k.delta>0?"▲":"▼"} ${Math.abs(k.delta).toFixed(1)}%</div>`:""}</div>`).join("");
 
   // Synthèse
   const fin=D.finances["21425"].series,fL=fin[fin.length-1];
   const emp=D.emploi["21425"].series;
   const eEvol=((emp[emp.length-1].emploi_salarie-emp[0].emploi_salarie)/emp[0].emploi_salarie)*100;
+  const eprHab=fL&&fL.pop_dgf?Math.round(fL.epargne_brute/fL.pop_dgf):null;
   document.getElementById("synth-grid").innerHTML=[
     {label:"Population",value:`${pEvol.toFixed(1)}%`,note:`depuis ${pF.year}`,color:"#f87171"},
     {label:"Revenu médian",value:`+${(((rL.median-rev[0].median)/rev[0].median)*100).toFixed(1)}%`,note:`depuis ${rev[0].year}`,color:"#34d399"},
     {label:"Emploi salarié",value:`${eEvol>0?"+":""}${eEvol.toFixed(1)}%`,note:`depuis ${emp[0].year}`,color:eEvol<0?"#f87171":"#34d399"},
-    {label:"Dette / hab.",value:fmt(Math.round(fL.dette/fL.pop_dgf)),note:"€ en 2024",color:"#fbbf24"},
-    {label:"Vote RN",value:fmtPct(elec[2022][rnK]),note:"présidentielle 2022",color:"#ef4444"},
+    {label:"Dette / hab.",value:fmt(fL&&fL.pop_dgf?Math.round(fL.dette/fL.pop_dgf):null),note:"€ en "+fL.year,color:"#f87171"},
+    {label:"Épargne brute/hab.",value:fmt(eprHab),note:"€ en "+fL.year,color:"#34d399"},
   ].map(s=>`<div class="synth-item"><div class="synth-label">${s.label}</div><div class="synth-value" style="color:${s.color}">${s.value}</div><div class="synth-note">${s.note}</div></div>`).join("");
 
   // Years
@@ -253,7 +279,6 @@ function build(D){
   const entYrs=D.entreprises["21425"].series.map(s=>s.year);
   const logYrs=D.logement["21425"].series.map(s=>s.year);
   const finYrs=D.finances["21425"].series.map(s=>s.year);
-  const eYrs=[2002,2007,2012,2017,2022];
   const base75={};
   C.forEach(({code})=>{const f=D.population[code].series.find(s=>s.year===1975);base75[code]=f?f.value:null;});
 
@@ -295,21 +320,63 @@ function build(D){
   // Vacance comparative
   mc("chart-vacance",{type:"bar",data:{labels:C.map(c=>c.nom),datasets:[{label:"1999",data:C.map(({code})=>{const s=D.logement[code].series[0];return s?+(s.vacants/s.total*100).toFixed(1):null;}),backgroundColor:"#47556999",borderColor:"#475569",borderWidth:1},{label:"2022",data:C.map(({code})=>{const s=D.logement[code].series[D.logement[code].series.length-1];return s?+(s.vacants/s.total*100).toFixed(1):null;}),backgroundColor:"#f8717199",borderColor:"#f87171",borderWidth:1}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:LEG,tooltip:TT},scales:{x:{grid:{display:false}},y:{grid:GRID,ticks:{callback:v=>`${v}%`}}}}});
 
-  // Budget
+  // === FINANCES ===
   const fD=D.finances["21425"].series;
-  mc("chart-budget",{type:"bar",data:{labels:finYrs,datasets:[{type:"bar",label:"Recettes fonct.",data:fD.map(s=>Math.round(s.recettes_fonct/1000)),backgroundColor:"#34d39966",borderColor:"#34d399",borderWidth:1},{type:"bar",label:"Dépenses fonct.",data:fD.map(s=>Math.round(s.depenses_fonct/1000)),backgroundColor:"#f8717166",borderColor:"#f87171",borderWidth:1},{type:"line",label:"Épargne brute",data:fD.map(s=>Math.round(s.epargne_brute/1000)),borderColor:"#fbbf24",borderWidth:2.5,pointRadius:3,tension:0.3,fill:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:LEG,tooltip:TT},scales:{x:{grid:GRID},y:{grid:GRID,ticks:{callback:v=>`${v}k€`}}}}});
+  const finYrs2=fD.map(s=>s.year);
 
-  // Dette
-  mc("chart-dette",{type:"line",data:{labels:finYrs,datasets:[{label:"€/habitant",data:fD.map(s=>Math.round(s.dette/s.pop_dgf)),borderColor:"#f87171",backgroundColor:"#f8717122",borderWidth:2.5,pointRadius:3,tension:0.3,fill:true}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:TT},scales:{x:{grid:GRID},y:{grid:GRID,ticks:{callback:v=>`${v} €`}}}}});
+  // Helper : données par commune pour un champ
+  const finC=(field)=>C.map(({code,nom})=>({
+    label:nom,
+    data:finYrs2.map(y=>{const r=D.finances[code]?.series.find(s=>s.year===y);return r&&r[field]!=null?Math.round(r[field]):null;}),
+    borderColor:COLORS[code],backgroundColor:COLORS[code]+"33",
+    borderWidth:code==="21425"?3:1.5,pointRadius:code==="21425"?4:2,tension:0.3,fill:false,spanGaps:false
+  }));
+  const finCHab=(field)=>C.map(({code,nom})=>({
+    label:nom,
+    data:finYrs2.map(y=>{const r=D.finances[code]?.series.find(s=>s.year===y);return(r&&r[field]!=null&&r.pop_dgf)?Math.round(r[field]/r.pop_dgf):null;}),
+    borderColor:COLORS[code],backgroundColor:COLORS[code]+"33",
+    borderWidth:code==="21425"?3:1.5,pointRadius:code==="21425"?4:2,tension:0.3,fill:false,spanGaps:false
+  }));
 
-  // Élections
-  mc("chart-elections",{type:"line",data:{labels:eYrs,datasets:C.map(({code,nom})=>({label:nom,data:eYrs.map(y=>{const s=D.elections[code].presidentielle_t2[y];if(!s)return null;const e=Object.entries(s).find(([k])=>k!=="abstention"&&!/FN|RN|Le Pen/.test(k));return e?e[1]:null;}),borderColor:COLORS[code],borderWidth:code==="21425"?3:1.5,pointRadius:code==="21425"?5:3,tension:0.1,fill:false}))},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:LEG,tooltip:TT},scales:{x:{grid:GRID},y:{grid:GRID,min:30,max:90,ticks:{callback:v=>`${v}%`}}}}});
+  // Budget fonctionnement (Montbard, barres + ligne épargne)
+  mc("chart-budget",{type:"bar",data:{labels:finYrs2,datasets:[
+    {type:"bar",label:"Recettes fonct.",data:fD.map(s=>s.recettes_fonct?Math.round(s.recettes_fonct):null),backgroundColor:"#34d39955",borderColor:"#34d399",borderWidth:1},
+    {type:"bar",label:"Dépenses fonct.",data:fD.map(s=>s.depenses_fonct?Math.round(s.depenses_fonct):null),backgroundColor:"#f8717155",borderColor:"#f87171",borderWidth:1},
+    {type:"line",label:"Épargne brute",data:fD.map(s=>s.epargne_brute?Math.round(s.epargne_brute):null),borderColor:"#fbbf24",borderWidth:2.5,pointRadius:4,tension:0.3,fill:false,yAxisID:"y"}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:LEG,tooltip:{...TT,callbacks:{label:ctx=>`${ctx.dataset.label}: ${(ctx.raw/1e6).toFixed(2)} M€`}}},scales:{x:{grid:GRID},y:{grid:GRID,ticks:{callback:v=>`${(v/1e6).toFixed(1)}M€`}}}}});
 
-  // Vote RN
-  mc("chart-rn",{type:"line",data:{labels:eYrs,datasets:[{label:"Vote FN/RN (%)",data:eYrs.map(y=>{const s=D.elections["21425"].presidentielle_t2[y];const k=Object.keys(s).find(k=>/FN|RN|Le Pen/.test(k));return k?s[k]:null;}),borderColor:"#ef4444",backgroundColor:"#ef444422",borderWidth:3,pointRadius:5,tension:0.2,fill:true}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:TT},scales:{x:{grid:GRID},y:{grid:GRID,min:0,max:60,ticks:{callback:v=>`${v}%`}}}}});
+  // Encours de dette absolu (Montbard)
+  mc("chart-dette-abs",{type:"line",data:{labels:finYrs2,datasets:[{label:"Encours de dette",data:fD.map(s=>s.dette?Math.round(s.dette):null),borderColor:"#f87171",backgroundColor:"#f8717122",borderWidth:2.5,pointRadius:4,tension:0.3,fill:true}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:ctx=>`${(ctx.raw/1e6).toFixed(2)} M€`}}},scales:{x:{grid:GRID},y:{grid:GRID,ticks:{callback:v=>`${(v/1e6).toFixed(1)}M€`}}}}});
 
-  // Abstention
-  mc("chart-abstention",{type:"bar",data:{labels:eYrs,datasets:C.map(({code,nom})=>({label:nom,data:eYrs.map(y=>{const s=D.elections[code].presidentielle_t2[y];return s?s.abstention:null;}),backgroundColor:COLORS[code]+"99",borderColor:COLORS[code],borderWidth:1}))},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:LEG,tooltip:TT},scales:{x:{grid:GRID},y:{grid:GRID,ticks:{callback:v=>`${v}%`}}}}});
+  // Dette par habitant comparée
+  mc("chart-dette-hab",{type:"line",data:{labels:finYrs2,datasets:finCHab("dette")},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:LEG,tooltip:TT},scales:{x:{grid:GRID},y:{grid:GRID,ticks:{callback:v=>`${v} €`}}}}});
+
+  // Annuité de la dette
+  mc("chart-annuite",{type:"bar",data:{labels:finYrs2,datasets:[{label:"Annuité dette",data:fD.map(s=>s.annuite_dette?Math.round(s.annuite_dette):null),backgroundColor:"#f4720b55",borderColor:"#f4720b",borderWidth:1}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:ctx=>`${(ctx.raw/1e6).toFixed(2)} M€`}}},scales:{x:{grid:GRID},y:{grid:GRID,ticks:{callback:v=>`${(v/1e6).toFixed(1)}M€`}}}}});
+
+  // Dépenses investissement comparées
+  mc("chart-invest",{type:"line",data:{labels:finYrs2,datasets:finC("depenses_invest")},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:LEG,tooltip:{...TT,callbacks:{label:ctx=>`${(ctx.raw/1e6).toFixed(2)} M€`}}},scales:{x:{grid:GRID},y:{grid:GRID,ticks:{callback:v=>`${(v/1e6).toFixed(1)}M€`}}}}});
+
+  // Équipement par habitant comparé
+  mc("chart-equipement-hab",{type:"line",data:{labels:finYrs2,datasets:finCHab("equipement")},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:LEG,tooltip:TT},scales:{x:{grid:GRID},y:{grid:GRID,ticks:{callback:v=>`${v} €`}}}}});
+
+  // Impôts locaux absolus (Montbard)
+  mc("chart-impots",{type:"bar",data:{labels:finYrs2,datasets:[{label:"Impôts locaux",data:fD.map(s=>s.impots_locaux?Math.round(s.impots_locaux):null),backgroundColor:"#a78bfa55",borderColor:"#a78bfa",borderWidth:1}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:ctx=>`${(ctx.raw/1e6).toFixed(2)} M€`}}},scales:{x:{grid:GRID},y:{grid:GRID,ticks:{callback:v=>`${(v/1e6).toFixed(1)}M€`}}}}});
+
+  // Impôts locaux par habitant comparés
+  mc("chart-impots-hab",{type:"line",data:{labels:finYrs2,datasets:finCHab("impots_locaux")},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:LEG,tooltip:TT},scales:{x:{grid:GRID},y:{grid:GRID,ticks:{callback:v=>`${v} €`}}}}});
+
+  // Frais personnel en % dépenses fonct
+  mc("chart-personnel",{type:"line",data:{labels:finYrs2,datasets:C.map(({code,nom})=>({
+    label:nom,
+    data:finYrs2.map(y=>{const r=D.finances[code]?.series.find(s=>s.year===y);return(r&&r.frais_personnel&&r.depenses_fonct)?+((r.frais_personnel/r.depenses_fonct)*100).toFixed(1):null;}),
+    borderColor:COLORS[code],borderWidth:code==="21425"?3:1.5,pointRadius:code==="21425"?4:2,tension:0.3,fill:false,spanGaps:false
+  }))},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:LEG,tooltip:TT},scales:{x:{grid:GRID},y:{grid:GRID,ticks:{callback:v=>`${v}%`}}}}});
+
+  // Épargne brute par habitant comparée
+  mc("chart-epargne-hab",{type:"line",data:{labels:finYrs2,datasets:finCHab("epargne_brute")},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:LEG,tooltip:TT},scales:{x:{grid:GRID},y:{grid:GRID,ticks:{callback:v=>`${v} €`}}}}});
+
+  // Volet politique supprimé
 }
 </script>
 </body>

@@ -392,32 +392,34 @@ def collect_elections() -> dict:
 def collect_finances_ofgl() -> dict:
     """
     Finances communales via l'API OFGL (format long : 1 ligne par agrégat).
-    On pagine tout puis on pivote sur les agrégats utiles.
+    Filtre sur cbudg=1 (budget principal uniquement) pour éviter les doublons.
 
-    Agrégats retenus (noms exacts OFGL) :
-      - "Recettes de fonctionnement"   → recettes_fonct
-      - "Dépenses de fonctionnement"   → depenses_fonct
-      - "Epargne brute"                → epargne_brute
-      - "Encours de dette"             → dette
-      - "Dépenses d'équipement"        → equipement
-    Population : champ ptot_n de n'importe quel enregistrement de l'année.
+    Agrégats retenus :
+      recettes_fonct, depenses_fonct, epargne_brute, dette, equipement,
+      frais_personnel, impots_locaux, dgf, annuite_dette, depenses_invest
     """
-    log("Collecte OFGL : finances communales (pagination + pivot)…")
+    log("Collecte OFGL : finances communales (budget principal, pivot)…")
 
     base_url = "https://data.ofgl.fr/api/explore/v2.1/catalog/datasets/ofgl-base-communes/records"
 
-    # Agrégats à extraire → clé dans notre JSON
     AGREGATS = {
         "Recettes de fonctionnement":  "recettes_fonct",
         "Dépenses de fonctionnement":  "depenses_fonct",
         "Epargne brute":               "epargne_brute",
         "Encours de dette":            "dette",
         "Dépenses d'équipement":       "equipement",
+        "Frais de personnel":          "frais_personnel",
+        "Impôts locaux":               "impots_locaux",
+        "Dotation globale de fonctionnement": "dgf",
+        "Annuité de la dette":         "annuite_dette",
+        "Dépenses d'investissement":   "depenses_invest",
     }
+
+    # Filtre OFGL : budget principal uniquement (cbudg=1)
+    agregats_where = " OR ".join(f'agregat="{a}"' for a in AGREGATS)
 
     results = {}
     for code, info in COMMUNES.items():
-        # Pagination complète
         all_records = []
         offset = 0
         total = None
@@ -425,11 +427,11 @@ def collect_finances_ofgl() -> dict:
             data = fetch_json(
                 base_url,
                 params={
-                    "where": f'insee="{code}"',
+                    "where": f'insee="{code}" AND cbudg=1 AND ({agregats_where})',
                     "limit": 100,
                     "offset": offset,
                     "select": "agregat,exer,montant,ptot_n",
-                    "order_by": "exer",
+                    "order_by": "exer,agregat",
                 },
                 sleep=0.3,
             )
@@ -438,7 +440,7 @@ def collect_finances_ofgl() -> dict:
             total = data.get("total_count", 0)
             all_records.extend(data["results"])
             offset += 100
-            if offset > total:
+            if len(all_records) >= total:
                 break
 
         if not all_records:
@@ -463,20 +465,23 @@ def collect_finances_ofgl() -> dict:
             if agregat in AGREGATS:
                 pivot[year][AGREGATS[agregat]] = montant
 
-        # Convertir en liste triée, ne garder que les années complètes
         series = []
         for year in sorted(pivot.keys()):
             row = pivot[year]
             entry = {
                 "year": year,
-                "recettes_fonct": row.get("recettes_fonct"),
+                "recettes_fonct":  row.get("recettes_fonct"),
                 "depenses_fonct":  row.get("depenses_fonct"),
                 "epargne_brute":   row.get("epargne_brute"),
                 "dette":           row.get("dette"),
                 "equipement":      row.get("equipement"),
+                "frais_personnel": row.get("frais_personnel"),
+                "impots_locaux":   row.get("impots_locaux"),
+                "dgf":             row.get("dgf"),
+                "annuite_dette":   row.get("annuite_dette"),
+                "depenses_invest": row.get("depenses_invest"),
                 "pop_dgf":         row.get("pop_dgf"),
             }
-            # N'inclure que si au moins les recettes sont présentes
             if entry["recettes_fonct"] is not None:
                 series.append(entry)
 
