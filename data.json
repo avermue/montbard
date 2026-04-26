@@ -1,35 +1,15 @@
 {
   "meta": {
     "communes": {
-      "21425": {
-        "nom": "Montbard",
-        "role": "principale"
-      },
-      "21663": {
-        "nom": "Venarey-les-Laumes",
-        "role": "comparaison"
-      },
-      "21603": {
-        "nom": "Semur-en-Auxois",
-        "role": "comparaison"
-      },
-      "21154": {
-        "nom": "Châtillon-sur-Seine",
-        "role": "comparaison"
-      }
+      "21425": "Montbard",
+      "21663": "Venarey-les-Laumes",
+      "21603": "Semur-en-Auxois",
+      "21154": "Châtillon-sur-Seine"
     },
-    "departement": "21",
-    "region": "27",
-    "collect_date": "2026-04-25T17:09:53.030379",
+    "collect_date": "2026-04-26T22:35:05.934638",
     "sources": {
-      "population": "INSEE — Recensements (fallback intégré)",
-      "demographie": "INSEE — RP + État civil",
-      "revenus": "INSEE — FiLoSoFi (2012-2022)",
-      "emploi": "INSEE — FLORES + France Travail",
-      "logement": "INSEE — RP Logements",
-      "entreprises": "INSEE — SIRENE + SIDE",
-      "finances": "OFGL — data.ofgl.fr (2012-2024)",
-      "elections": "Ministère Intérieur — data.gouv.fr"
+      "population": "INSEE Melodi DS_POPULATIONS_HISTORIQUES (ZIP public, PMUN 1968-2023)",
+      "finances": "DGFiP data.gouv.fr 2000-2016 + OFGL 2017-2024 (cbudg=1)"
     }
   },
   "population": {
@@ -37,894 +17,76 @@
       "commune": "Montbard",
       "series": [
         {
-          "year": 1975,
-          "value": 7826
-        },
-        {
-          "year": 1982,
-          "value": 7609
-        },
-        {
-          "year": 1990,
-          "value": 7108
-        },
-        {
-          "year": 1999,
-          "value": 6300
-        },
-        {
           "year": 2006,
-          "value": 6024
+          "value": 5597
         },
         {
-          "year": 2011,
-          "value": 5599
+          "year": 2007,
+          "value": 5582
         },
         {
-          "year": 2016,
-          "value": 5368
+          "year": 2008,
+          "value": 5554
         },
         {
-          "year": 2019,
-          "value": 5204
+          "year": 2009,
+          "value": 5527
         },
-        {
-          "year": 2022,
-          "value": 5020
-        }
-      ]
-    },
-    "21663": {
-      "commune": "Venarey-les-Laumes",
-      "series": [
-        {
-          "year": 1975,
-          "value": 3605
-        },
-        {
-          "year": 1982,
-          "value": 3486
-        },
-        {
-          "year": 1990,
-          "value": 3378
-        },
-        {
-          "year": 1999,
-          "value": 3175
-        },
-        {
-          "year": 2006,
-          "value": 3086
-        },
-        {
-          "year": 2011,
-          "value": 3097
-        },
-        {
-          "year": 2016,
-          "value": 3064
-        },
-        {
-          "year": 2019,
-          "value": 2995
-        },
-        {
-          "year": 2022,
-          "value": 2898
-        }
-      ]
-    },
-    "21603": {
-      "commune": "Semur-en-Auxois",
-      "series": [
-        {
-          "year": 1975,
-          "value": 5363
-        },
-        {
-          "year": 1982,
-          "value": 5082
-        },
-        {
-          "year": 1990,
-          "value": 4545
-        },
-        {
-          "year": 1999,
-          "value": 4292
-        },
-        {
-          "year": 2006,
-          "value": 4454
-        },
-        {
-          "year": 2011,
-          "value": 4380
-        },
-        {
-          "year": 2016,
-          "value": 4242
-        },
-        {
-          "year": 2019,
-          "value": 4099
-        },
-        {
-          "year": 2022,
-          "value": 4011
-        }
-      ]
-    },
-    "21154": {
-      "commune": "Châtillon-sur-Seine",
-      "series": [
-        {
-          "year": 1975,
-          "value": 7954
-        },
-        {
-          "year": 1982,
-          "value": 7613
-        },
-        {
-          "year": 1990,
-          "value": 6862
-        },
-        {
-          "year": 1999,
-          "value": 6269
-        },
-        {
-          "year": 2006,
-          "value": 5946
-        },
-        {
-          "year": 2011,
-          "value": 5671
-        },
-        {
-          "year": 2016,
-          "value": 5397
-        },
-        {
-          "year": 2019,
-          "value": 5206
-        },
-        {
-          "year": 2022,
-          "value": 5048
-        }
-      ]
-    }
-  },
-  "demographie": {
-    "21425": {
-      "commune": "Montbard",
-      "pyramide_2022": {
-        "0-14": 16.2,
-        "15-29": 14.8,
-        "30-44": 16.1,
-        "45-59": 19.5,
-        "60-74": 19.8,
-        "75+": 13.6
-      },
-      "indicateurs": [
-        {
-          "year": 2011,
-          "age_median": 43.8,
-          "taux_natalite": 11.2,
-          "taux_mortalite": 12.4
-        },
-        {
-          "year": 2016,
-          "age_median": 44.9,
-          "taux_natalite": 10.5,
-          "taux_mortalite": 13.1
-        },
-        {
-          "year": 2019,
-          "age_median": 45.8,
-          "taux_natalite": 9.8,
-          "taux_mortalite": 13.6
-        },
-        {
-          "year": 2022,
-          "age_median": 46.5,
-          "taux_natalite": 9.2,
-          "taux_mortalite": 14.1
-        }
-      ]
-    },
-    "21663": {
-      "commune": "Venarey-les-Laumes",
-      "pyramide_2022": {
-        "0-14": 15.8,
-        "15-29": 13.2,
-        "30-44": 15.9,
-        "45-59": 20.1,
-        "60-74": 21.4,
-        "75+": 13.6
-      },
-      "indicateurs": [
-        {
-          "year": 2011,
-          "age_median": 45.2,
-          "taux_natalite": 10.1,
-          "taux_mortalite": 13.2
-        },
-        {
-          "year": 2016,
-          "age_median": 46.3,
-          "taux_natalite": 9.5,
-          "taux_mortalite": 13.8
-        },
-        {
-          "year": 2019,
-          "age_median": 47.1,
-          "taux_natalite": 8.9,
-          "taux_mortalite": 14.1
-        },
-        {
-          "year": 2022,
-          "age_median": 47.8,
-          "taux_natalite": 8.4,
-          "taux_mortalite": 14.5
-        }
-      ]
-    },
-    "21603": {
-      "commune": "Semur-en-Auxois",
-      "pyramide_2022": {
-        "0-14": 16.5,
-        "15-29": 14.2,
-        "30-44": 16.8,
-        "45-59": 19.1,
-        "60-74": 20.3,
-        "75+": 13.1
-      },
-      "indicateurs": [
-        {
-          "year": 2011,
-          "age_median": 44.1,
-          "taux_natalite": 10.8,
-          "taux_mortalite": 12.1
-        },
-        {
-          "year": 2016,
-          "age_median": 45.0,
-          "taux_natalite": 10.2,
-          "taux_mortalite": 12.6
-        },
-        {
-          "year": 2019,
-          "age_median": 45.7,
-          "taux_natalite": 9.5,
-          "taux_mortalite": 13.0
-        },
-        {
-          "year": 2022,
-          "age_median": 46.4,
-          "taux_natalite": 9.0,
-          "taux_mortalite": 13.4
-        }
-      ]
-    },
-    "21154": {
-      "commune": "Châtillon-sur-Seine",
-      "pyramide_2022": {
-        "0-14": 15.5,
-        "15-29": 14.0,
-        "30-44": 15.7,
-        "45-59": 19.3,
-        "60-74": 20.9,
-        "75+": 14.6
-      },
-      "indicateurs": [
-        {
-          "year": 2011,
-          "age_median": 45.5,
-          "taux_natalite": 10.5,
-          "taux_mortalite": 13.5
-        },
-        {
-          "year": 2016,
-          "age_median": 46.6,
-          "taux_natalite": 9.8,
-          "taux_mortalite": 14.0
-        },
-        {
-          "year": 2019,
-          "age_median": 47.4,
-          "taux_natalite": 9.1,
-          "taux_mortalite": 14.4
-        },
-        {
-          "year": 2022,
-          "age_median": 48.1,
-          "taux_natalite": 8.6,
-          "taux_mortalite": 14.8
-        }
-      ]
-    }
-  },
-  "revenus": {
-    "21425": {
-      "commune": "Montbard",
-      "series": [
-        {
-          "year": 2012,
-          "median": 18100,
-          "pauvrete": 14.1,
-          "gini": 0.28
-        },
-        {
-          "year": 2014,
-          "median": 18700,
-          "pauvrete": 14.5,
-          "gini": 0.28
-        },
-        {
-          "year": 2016,
-          "median": 19300,
-          "pauvrete": 14.8,
-          "gini": 0.29
-        },
-        {
-          "year": 2018,
-          "median": 19800,
-          "pauvrete": 15.1,
-          "gini": 0.29
-        },
-        {
-          "year": 2020,
-          "median": 20500,
-          "pauvrete": 14.9,
-          "gini": 0.29
-        },
-        {
-          "year": 2021,
-          "median": 21100,
-          "pauvrete": 14.6,
-          "gini": 0.29
-        },
-        {
-          "year": 2022,
-          "median": 21800,
-          "pauvrete": 14.4,
-          "gini": 0.29
-        }
-      ]
-    },
-    "21663": {
-      "commune": "Venarey-les-Laumes",
-      "series": [
-        {
-          "year": 2012,
-          "median": 18800,
-          "pauvrete": 11.5,
-          "gini": 0.26
-        },
-        {
-          "year": 2014,
-          "median": 19400,
-          "pauvrete": 11.8,
-          "gini": 0.26
-        },
-        {
-          "year": 2016,
-          "median": 20100,
-          "pauvrete": 11.9,
-          "gini": 0.26
-        },
-        {
-          "year": 2018,
-          "median": 20700,
-          "pauvrete": 12.1,
-          "gini": 0.26
-        },
-        {
-          "year": 2020,
-          "median": 21500,
-          "pauvrete": 11.8,
-          "gini": 0.26
-        },
-        {
-          "year": 2021,
-          "median": 22100,
-          "pauvrete": 11.5,
-          "gini": 0.26
-        },
-        {
-          "year": 2022,
-          "median": 22800,
-          "pauvrete": 11.3,
-          "gini": 0.26
-        }
-      ]
-    },
-    "21603": {
-      "commune": "Semur-en-Auxois",
-      "series": [
-        {
-          "year": 2012,
-          "median": 19500,
-          "pauvrete": 12.2,
-          "gini": 0.27
-        },
-        {
-          "year": 2014,
-          "median": 20100,
-          "pauvrete": 12.4,
-          "gini": 0.27
-        },
-        {
-          "year": 2016,
-          "median": 20800,
-          "pauvrete": 12.5,
-          "gini": 0.27
-        },
-        {
-          "year": 2018,
-          "median": 21400,
-          "pauvrete": 12.7,
-          "gini": 0.27
-        },
-        {
-          "year": 2020,
-          "median": 22200,
-          "pauvrete": 12.4,
-          "gini": 0.27
-        },
-        {
-          "year": 2021,
-          "median": 22800,
-          "pauvrete": 12.1,
-          "gini": 0.27
-        },
-        {
-          "year": 2022,
-          "median": 23500,
-          "pauvrete": 11.9,
-          "gini": 0.27
-        }
-      ]
-    },
-    "21154": {
-      "commune": "Châtillon-sur-Seine",
-      "series": [
-        {
-          "year": 2012,
-          "median": 18500,
-          "pauvrete": 13.8,
-          "gini": 0.28
-        },
-        {
-          "year": 2014,
-          "median": 19100,
-          "pauvrete": 14.1,
-          "gini": 0.28
-        },
-        {
-          "year": 2016,
-          "median": 19700,
-          "pauvrete": 14.3,
-          "gini": 0.28
-        },
-        {
-          "year": 2018,
-          "median": 20300,
-          "pauvrete": 14.5,
-          "gini": 0.28
-        },
-        {
-          "year": 2020,
-          "median": 21000,
-          "pauvrete": 14.3,
-          "gini": 0.28
-        },
-        {
-          "year": 2021,
-          "median": 21600,
-          "pauvrete": 14.0,
-          "gini": 0.28
-        },
-        {
-          "year": 2022,
-          "median": 22300,
-          "pauvrete": 13.8,
-          "gini": 0.28
-        }
-      ]
-    }
-  },
-  "emploi": {
-    "21425": {
-      "commune": "Montbard",
-      "series": [
         {
           "year": 2010,
-          "emploi_salarie": 3150,
-          "chomage_ze": 9.1
-        },
-        {
-          "year": 2012,
-          "emploi_salarie": 3020,
-          "chomage_ze": 9.8
-        },
-        {
-          "year": 2014,
-          "emploi_salarie": 2890,
-          "chomage_ze": 10.2
-        },
-        {
-          "year": 2016,
-          "emploi_salarie": 2810,
-          "chomage_ze": 9.5
-        },
-        {
-          "year": 2018,
-          "emploi_salarie": 2870,
-          "chomage_ze": 8.4
-        },
-        {
-          "year": 2020,
-          "emploi_salarie": 2740,
-          "chomage_ze": 8.1
-        },
-        {
-          "year": 2022,
-          "emploi_salarie": 2820,
-          "chomage_ze": 7.2
-        },
-        {
-          "year": 2023,
-          "emploi_salarie": 2850,
-          "chomage_ze": 6.9
-        }
-      ]
-    },
-    "21663": {
-      "commune": "Venarey-les-Laumes",
-      "series": [
-        {
-          "year": 2010,
-          "emploi_salarie": 1420,
-          "chomage_ze": 9.1
-        },
-        {
-          "year": 2012,
-          "emploi_salarie": 1380,
-          "chomage_ze": 9.8
-        },
-        {
-          "year": 2014,
-          "emploi_salarie": 1340,
-          "chomage_ze": 10.2
-        },
-        {
-          "year": 2016,
-          "emploi_salarie": 1310,
-          "chomage_ze": 9.5
-        },
-        {
-          "year": 2018,
-          "emploi_salarie": 1290,
-          "chomage_ze": 8.4
-        },
-        {
-          "year": 2020,
-          "emploi_salarie": 1260,
-          "chomage_ze": 8.1
-        },
-        {
-          "year": 2022,
-          "emploi_salarie": 1280,
-          "chomage_ze": 7.2
-        },
-        {
-          "year": 2023,
-          "emploi_salarie": 1290,
-          "chomage_ze": 6.9
-        }
-      ]
-    },
-    "21603": {
-      "commune": "Semur-en-Auxois",
-      "series": [
-        {
-          "year": 2010,
-          "emploi_salarie": 2680,
-          "chomage_ze": 8.2
-        },
-        {
-          "year": 2012,
-          "emploi_salarie": 2620,
-          "chomage_ze": 8.9
-        },
-        {
-          "year": 2014,
-          "emploi_salarie": 2580,
-          "chomage_ze": 9.1
-        },
-        {
-          "year": 2016,
-          "emploi_salarie": 2550,
-          "chomage_ze": 8.6
-        },
-        {
-          "year": 2018,
-          "emploi_salarie": 2610,
-          "chomage_ze": 7.8
-        },
-        {
-          "year": 2020,
-          "emploi_salarie": 2550,
-          "chomage_ze": 7.5
-        },
-        {
-          "year": 2022,
-          "emploi_salarie": 2620,
-          "chomage_ze": 6.8
-        },
-        {
-          "year": 2023,
-          "emploi_salarie": 2650,
-          "chomage_ze": 6.5
-        }
-      ]
-    },
-    "21154": {
-      "commune": "Châtillon-sur-Seine",
-      "series": [
-        {
-          "year": 2010,
-          "emploi_salarie": 2980,
-          "chomage_ze": 9.4
-        },
-        {
-          "year": 2012,
-          "emploi_salarie": 2890,
-          "chomage_ze": 10.1
-        },
-        {
-          "year": 2014,
-          "emploi_salarie": 2810,
-          "chomage_ze": 10.6
-        },
-        {
-          "year": 2016,
-          "emploi_salarie": 2740,
-          "chomage_ze": 9.9
-        },
-        {
-          "year": 2018,
-          "emploi_salarie": 2780,
-          "chomage_ze": 8.9
-        },
-        {
-          "year": 2020,
-          "emploi_salarie": 2700,
-          "chomage_ze": 8.5
-        },
-        {
-          "year": 2022,
-          "emploi_salarie": 2760,
-          "chomage_ze": 7.6
-        },
-        {
-          "year": 2023,
-          "emploi_salarie": 2780,
-          "chomage_ze": 7.3
-        }
-      ]
-    }
-  },
-  "logement": {
-    "21425": {
-      "commune": "Montbard",
-      "series": [
-        {
-          "year": 1999,
-          "total": 3124,
-          "principales": 2716,
-          "vacants": 311,
-          "secondaires": 97
+          "value": 5513
         },
         {
           "year": 2011,
-          "total": 3211,
-          "principales": 2633,
-          "vacants": 496,
-          "secondaires": 82
+          "value": 5476
         },
         {
-          "year": 2016,
-          "total": 3278,
-          "principales": 2569,
-          "vacants": 618,
-          "secondaires": 91
+          "year": 2012,
+          "value": 5437
         },
         {
-          "year": 2019,
-          "total": 3298,
-          "principales": 2497,
-          "vacants": 701,
-          "secondaires": 100
+          "year": 2013,
+          "value": 5394
         },
         {
-          "year": 2022,
-          "total": 3305,
-          "principales": 2410,
-          "vacants": 787,
-          "secondaires": 108
-        }
-      ]
-    },
-    "21663": {
-      "commune": "Venarey-les-Laumes",
-      "series": [
-        {
-          "year": 1999,
-          "total": 1468,
-          "principales": 1305,
-          "vacants": 111,
-          "secondaires": 52
+          "year": 2014,
+          "value": 5350
         },
-        {
-          "year": 2011,
-          "total": 1541,
-          "principales": 1340,
-          "vacants": 159,
-          "secondaires": 42
-        },
-        {
-          "year": 2016,
-          "total": 1572,
-          "principales": 1340,
-          "vacants": 181,
-          "secondaires": 51
-        },
-        {
-          "year": 2019,
-          "total": 1596,
-          "principales": 1327,
-          "vacants": 213,
-          "secondaires": 56
-        },
-        {
-          "year": 2022,
-          "total": 1612,
-          "principales": 1301,
-          "vacants": 249,
-          "secondaires": 62
-        }
-      ]
-    },
-    "21603": {
-      "commune": "Semur-en-Auxois",
-      "series": [
-        {
-          "year": 1999,
-          "total": 2087,
-          "principales": 1864,
-          "vacants": 158,
-          "secondaires": 65
-        },
-        {
-          "year": 2011,
-          "total": 2231,
-          "principales": 1943,
-          "vacants": 217,
-          "secondaires": 71
-        },
-        {
-          "year": 2016,
-          "total": 2289,
-          "principales": 1915,
-          "vacants": 287,
-          "secondaires": 87
-        },
-        {
-          "year": 2019,
-          "total": 2315,
-          "principales": 1868,
-          "vacants": 349,
-          "secondaires": 98
-        },
-        {
-          "year": 2022,
-          "total": 2338,
-          "principales": 1839,
-          "vacants": 391,
-          "secondaires": 108
-        }
-      ]
-    },
-    "21154": {
-      "commune": "Châtillon-sur-Seine",
-      "series": [
-        {
-          "year": 1999,
-          "total": 3089,
-          "principales": 2707,
-          "vacants": 291,
-          "secondaires": 91
-        },
-        {
-          "year": 2011,
-          "total": 3234,
-          "principales": 2625,
-          "vacants": 520,
-          "secondaires": 89
-        },
-        {
-          "year": 2016,
-          "total": 3301,
-          "principales": 2556,
-          "vacants": 654,
-          "secondaires": 91
-        },
-        {
-          "year": 2019,
-          "total": 3331,
-          "principales": 2499,
-          "vacants": 732,
-          "secondaires": 100
-        },
-        {
-          "year": 2022,
-          "total": 3348,
-          "principales": 2444,
-          "vacants": 797,
-          "secondaires": 107
-        }
-      ]
-    }
-  },
-  "entreprises": {
-    "21425": {
-      "commune": "Montbard",
-      "series": [
         {
           "year": 2015,
-          "creations": 42,
-          "total_actifs": 412,
-          "industrie": 38,
-          "commerce": 112,
-          "services": 224
+          "value": 5331
+        },
+        {
+          "year": 2016,
+          "value": 5334
         },
         {
           "year": 2017,
-          "creations": 48,
-          "total_actifs": 428,
-          "industrie": 36,
-          "commerce": 108,
-          "services": 246
+          "value": 5160
+        },
+        {
+          "year": 2018,
+          "value": 5004
         },
         {
           "year": 2019,
-          "creations": 58,
-          "total_actifs": 445,
-          "industrie": 34,
-          "commerce": 106,
-          "services": 267
+          "value": 4848
+        },
+        {
+          "year": 2020,
+          "value": 4831
         },
         {
           "year": 2021,
-          "creations": 72,
-          "total_actifs": 471,
-          "industrie": 32,
-          "commerce": 109,
-          "services": 294
+          "value": 4788
+        },
+        {
+          "year": 2022,
+          "value": 4751
         },
         {
           "year": 2023,
-          "creations": 81,
-          "total_actifs": 498,
-          "industrie": 33,
-          "commerce": 112,
-          "services": 316
+          "value": 4639
         }
       ]
     },
@@ -932,44 +94,76 @@
       "commune": "Venarey-les-Laumes",
       "series": [
         {
+          "year": 2006,
+          "value": 3068
+        },
+        {
+          "year": 2007,
+          "value": 3052
+        },
+        {
+          "year": 2008,
+          "value": 3046
+        },
+        {
+          "year": 2009,
+          "value": 2981
+        },
+        {
+          "year": 2010,
+          "value": 2947
+        },
+        {
+          "year": 2011,
+          "value": 2913
+        },
+        {
+          "year": 2012,
+          "value": 2906
+        },
+        {
+          "year": 2013,
+          "value": 2895
+        },
+        {
+          "year": 2014,
+          "value": 2902
+        },
+        {
           "year": 2015,
-          "creations": 18,
-          "total_actifs": 198,
-          "industrie": 14,
-          "commerce": 56,
-          "services": 108
+          "value": 2901
+        },
+        {
+          "year": 2016,
+          "value": 2899
         },
         {
           "year": 2017,
-          "creations": 21,
-          "total_actifs": 205,
-          "industrie": 13,
-          "commerce": 54,
-          "services": 118
+          "value": 2884
+        },
+        {
+          "year": 2018,
+          "value": 2859
         },
         {
           "year": 2019,
-          "creations": 24,
-          "total_actifs": 214,
-          "industrie": 13,
-          "commerce": 52,
-          "services": 129
+          "value": 2846
+        },
+        {
+          "year": 2020,
+          "value": 2811
         },
         {
           "year": 2021,
-          "creations": 31,
-          "total_actifs": 228,
-          "industrie": 12,
-          "commerce": 53,
-          "services": 143
+          "value": 2784
+        },
+        {
+          "year": 2022,
+          "value": 2758
         },
         {
           "year": 2023,
-          "creations": 35,
-          "total_actifs": 241,
-          "industrie": 12,
-          "commerce": 54,
-          "services": 155
+          "value": 2747
         }
       ]
     },
@@ -977,44 +171,76 @@
       "commune": "Semur-en-Auxois",
       "series": [
         {
+          "year": 2006,
+          "value": 4261
+        },
+        {
+          "year": 2007,
+          "value": 4195
+        },
+        {
+          "year": 2008,
+          "value": 4240
+        },
+        {
+          "year": 2009,
+          "value": 4260
+        },
+        {
+          "year": 2010,
+          "value": 4195
+        },
+        {
+          "year": 2011,
+          "value": 4166
+        },
+        {
+          "year": 2012,
+          "value": 4138
+        },
+        {
+          "year": 2013,
+          "value": 4107
+        },
+        {
+          "year": 2014,
+          "value": 4078
+        },
+        {
           "year": 2015,
-          "creations": 35,
-          "total_actifs": 368,
-          "industrie": 26,
-          "commerce": 98,
-          "services": 214
+          "value": 4124
+        },
+        {
+          "year": 2016,
+          "value": 4132
         },
         {
           "year": 2017,
-          "creations": 42,
-          "total_actifs": 385,
-          "industrie": 25,
-          "commerce": 96,
-          "services": 234
+          "value": 4139
+        },
+        {
+          "year": 2018,
+          "value": 4131
         },
         {
           "year": 2019,
-          "creations": 52,
-          "total_actifs": 408,
-          "industrie": 24,
-          "commerce": 95,
-          "services": 259
+          "value": 4120
+        },
+        {
+          "year": 2020,
+          "value": 4114
         },
         {
           "year": 2021,
-          "creations": 68,
-          "total_actifs": 441,
-          "industrie": 23,
-          "commerce": 97,
-          "services": 291
+          "value": 4068
+        },
+        {
+          "year": 2022,
+          "value": 4027
         },
         {
           "year": 2023,
-          "creations": 76,
-          "total_actifs": 472,
-          "industrie": 24,
-          "commerce": 100,
-          "services": 318
+          "value": 3986
         }
       ]
     },
@@ -1022,44 +248,76 @@
       "commune": "Châtillon-sur-Seine",
       "series": [
         {
+          "year": 2006,
+          "value": 5837
+        },
+        {
+          "year": 2007,
+          "value": 5801
+        },
+        {
+          "year": 2008,
+          "value": 5719
+        },
+        {
+          "year": 2009,
+          "value": 5613
+        },
+        {
+          "year": 2010,
+          "value": 5564
+        },
+        {
+          "year": 2011,
+          "value": 5515
+        },
+        {
+          "year": 2012,
+          "value": 5487
+        },
+        {
+          "year": 2013,
+          "value": 5478
+        },
+        {
+          "year": 2014,
+          "value": 5392
+        },
+        {
           "year": 2015,
-          "creations": 38,
-          "total_actifs": 398,
-          "industrie": 34,
-          "commerce": 108,
-          "services": 216
+          "value": 5385
+        },
+        {
+          "year": 2016,
+          "value": 5378
         },
         {
           "year": 2017,
-          "creations": 44,
-          "total_actifs": 412,
-          "industrie": 32,
-          "commerce": 106,
-          "services": 234
+          "value": 5373
+        },
+        {
+          "year": 2018,
+          "value": 5354
         },
         {
           "year": 2019,
-          "creations": 52,
-          "total_actifs": 432,
-          "industrie": 30,
-          "commerce": 104,
-          "services": 258
+          "value": 5347
+        },
+        {
+          "year": 2020,
+          "value": 5352
         },
         {
           "year": 2021,
-          "creations": 65,
-          "total_actifs": 461,
-          "industrie": 29,
-          "commerce": 106,
-          "services": 286
+          "value": 5378
+        },
+        {
+          "year": 2022,
+          "value": 5404
         },
         {
           "year": 2023,
-          "creations": 74,
-          "total_actifs": 489,
-          "industrie": 30,
-          "commerce": 109,
-          "services": 310
+          "value": 5443
         }
       ]
     }
@@ -1069,116 +327,354 @@
       "commune": "Montbard",
       "series": [
         {
+          "year": 2000,
+          "recettes_fonct": 8284000,
+          "depenses_fonct": 7190000,
+          "epargne_brute": 1312000,
+          "dette": 10792000,
+          "equipement": 2545000,
+          "frais_personnel": 3108000,
+          "impots_locaux": 4530000,
+          "annuite_dette": 0,
+          "depenses_invest": 4695000,
+          "dgf": null,
+          "pop_dgf": 6643
+        },
+        {
+          "year": 2001,
+          "recettes_fonct": 8300000,
+          "depenses_fonct": 7243000,
+          "epargne_brute": 1230000,
+          "dette": 11346000,
+          "equipement": 3354000,
+          "frais_personnel": 3309000,
+          "impots_locaux": 4746000,
+          "annuite_dette": 0,
+          "depenses_invest": 4417000,
+          "dgf": null,
+          "pop_dgf": 6643
+        },
+        {
+          "year": 2002,
+          "recettes_fonct": 8870000,
+          "depenses_fonct": 7681000,
+          "epargne_brute": 1301000,
+          "dette": 12581000,
+          "equipement": 3880000,
+          "frais_personnel": 3366000,
+          "impots_locaux": 4660000,
+          "annuite_dette": 0,
+          "depenses_invest": 4938000,
+          "dgf": null,
+          "pop_dgf": 6643
+        },
+        {
+          "year": 2003,
+          "recettes_fonct": 8858000,
+          "depenses_fonct": 7103000,
+          "epargne_brute": 2012000,
+          "dette": 16757000,
+          "equipement": 5975000,
+          "frais_personnel": 3521000,
+          "impots_locaux": 5258000,
+          "annuite_dette": 0,
+          "depenses_invest": 7347000,
+          "dgf": null,
+          "pop_dgf": 6643
+        },
+        {
+          "year": 2004,
+          "recettes_fonct": 9531000,
+          "depenses_fonct": 8570000,
+          "epargne_brute": 1310000,
+          "dette": 19113000,
+          "equipement": 7554000,
+          "frais_personnel": 3837000,
+          "impots_locaux": 5614000,
+          "annuite_dette": 0,
+          "depenses_invest": 9060000,
+          "dgf": null,
+          "pop_dgf": 6643
+        },
+        {
+          "year": 2005,
+          "recettes_fonct": 10058000,
+          "depenses_fonct": 9288000,
+          "epargne_brute": 1255000,
+          "dette": 19245000,
+          "equipement": 3162000,
+          "frais_personnel": 3901000,
+          "impots_locaux": 5829000,
+          "annuite_dette": 0,
+          "depenses_invest": 9606000,
+          "dgf": null,
+          "pop_dgf": 6643
+        },
+        {
+          "year": 2006,
+          "recettes_fonct": 9859000,
+          "depenses_fonct": 9212000,
+          "epargne_brute": 1079000,
+          "dette": 18769000,
+          "equipement": 3026000,
+          "frais_personnel": 4215000,
+          "impots_locaux": 5763000,
+          "annuite_dette": 0,
+          "depenses_invest": 4523000,
+          "dgf": null,
+          "pop_dgf": 6643
+        },
+        {
+          "year": 2007,
+          "recettes_fonct": 11373000,
+          "depenses_fonct": 10874000,
+          "epargne_brute": 967000,
+          "dette": 18971000,
+          "equipement": 3110000,
+          "frais_personnel": 4410000,
+          "impots_locaux": 5941000,
+          "annuite_dette": 0,
+          "depenses_invest": 5161000,
+          "dgf": null,
+          "pop_dgf": 6643
+        },
+        {
+          "year": 2008,
+          "recettes_fonct": 10975000,
+          "depenses_fonct": 9703000,
+          "epargne_brute": 1735000,
+          "dette": 19533000,
+          "equipement": 3012000,
+          "frais_personnel": 4303000,
+          "impots_locaux": 6565000,
+          "annuite_dette": 0,
+          "depenses_invest": 5046000,
+          "dgf": null,
+          "pop_dgf": 6643
+        },
+        {
+          "year": 2009,
+          "recettes_fonct": 11659000,
+          "depenses_fonct": 9870000,
+          "epargne_brute": 2212000,
+          "dette": 19227000,
+          "equipement": 1384000,
+          "frais_personnel": 4404000,
+          "impots_locaux": 6873000,
+          "annuite_dette": 0,
+          "depenses_invest": 2838000,
+          "dgf": null,
+          "pop_dgf": 5845
+        },
+        {
+          "year": 2010,
+          "recettes_fonct": 12179000,
+          "depenses_fonct": 10291000,
+          "epargne_brute": 2312000,
+          "dette": 18754000,
+          "equipement": 2300000,
+          "frais_personnel": 4591000,
+          "impots_locaux": 7232000,
+          "annuite_dette": 2106000,
+          "depenses_invest": 3790000,
+          "dgf": null,
+          "pop_dgf": 5784
+        },
+        {
+          "year": 2011,
+          "recettes_fonct": 12711000,
+          "depenses_fonct": 10435000,
+          "epargne_brute": 2704000,
+          "dette": 19413000,
+          "equipement": 2073000,
+          "frais_personnel": 4667000,
+          "impots_locaux": 6820000,
+          "annuite_dette": 2084000,
+          "depenses_invest": 3546000,
+          "dgf": null,
+          "pop_dgf": 5751
+        },
+        {
+          "year": 2012,
+          "recettes_fonct": 12156000,
+          "depenses_fonct": 10698000,
+          "epargne_brute": 1853000,
+          "dette": 19457000,
+          "equipement": 2914000,
+          "frais_personnel": 5044000,
+          "impots_locaux": 6782000,
+          "annuite_dette": 2113000,
+          "depenses_invest": 7314000,
+          "dgf": null,
+          "pop_dgf": 5718
+        },
+        {
+          "year": 2013,
+          "recettes_fonct": 12625000,
+          "depenses_fonct": 10299000,
+          "epargne_brute": 2740000,
+          "dette": 18069000,
+          "equipement": 3966000,
+          "frais_personnel": 5069000,
+          "impots_locaux": 7548000,
+          "annuite_dette": 2148000,
+          "depenses_invest": 5661000,
+          "dgf": null,
+          "pop_dgf": 5705
+        },
+        {
+          "year": 2014,
+          "recettes_fonct": 13915000,
+          "depenses_fonct": 11365000,
+          "epargne_brute": 2928000,
+          "dette": 16602000,
+          "equipement": 2434000,
+          "frais_personnel": 5244000,
+          "impots_locaux": 8228000,
+          "annuite_dette": 2158000,
+          "depenses_invest": 4725000,
+          "dgf": null,
+          "pop_dgf": 5668
+        },
+        {
+          "year": 2015,
+          "recettes_fonct": 12075000,
+          "depenses_fonct": 10220000,
+          "epargne_brute": 2210000,
+          "dette": 16732000,
+          "equipement": 2631000,
+          "frais_personnel": 5172000,
+          "impots_locaux": 7566000,
+          "annuite_dette": 2150000,
+          "depenses_invest": 4314000,
+          "dgf": null,
+          "pop_dgf": 5588
+        },
+        {
+          "year": 2016,
+          "recettes_fonct": 12195000,
+          "depenses_fonct": 9577000,
+          "epargne_brute": 2918000,
+          "dette": 16489000,
+          "equipement": 1638000,
+          "frais_personnel": 5157000,
+          "impots_locaux": 7956000,
+          "annuite_dette": 2212000,
+          "depenses_invest": 3320000,
+          "dgf": null,
+          "pop_dgf": 5543
+        },
+        {
           "year": 2017,
-          "recettes_fonct": 11532855.18,
-          "depenses_fonct": 9776492.38,
-          "epargne_brute": 1756362.8,
-          "dette": 15767320.21,
-          "equipement": 2263937.4,
-          "frais_personnel": 5199243.73,
-          "impots_locaux": 7825583.0,
-          "dgf": 373590.0,
-          "annuite_dette": 2147833.15,
-          "depenses_invest": 4014934.42,
-          "pop_dgf": 4914.0
+          "recettes_fonct": 11532855,
+          "depenses_fonct": 9776492,
+          "epargne_brute": 1756363,
+          "dette": 15767320,
+          "equipement": 2263937,
+          "frais_personnel": 5199244,
+          "impots_locaux": 7825583,
+          "dgf": 373590,
+          "annuite_dette": 2147833,
+          "depenses_invest": 4014934,
+          "pop_dgf": 4914
         },
         {
           "year": 2018,
-          "recettes_fonct": 11672535.7,
-          "depenses_fonct": 9101835.8,
-          "epargne_brute": 2570699.9,
-          "dette": 14977261.59,
-          "equipement": 2623813.72,
-          "frais_personnel": 5068747.13,
-          "impots_locaux": 7998288.46,
-          "dgf": 311000.0,
-          "annuite_dette": 2265680.97,
-          "depenses_invest": 4569647.21,
-          "pop_dgf": 4914.0
+          "recettes_fonct": 11672536,
+          "depenses_fonct": 9101836,
+          "epargne_brute": 2570700,
+          "dette": 14977262,
+          "equipement": 2623814,
+          "frais_personnel": 5068747,
+          "impots_locaux": 7998288,
+          "dgf": 311000,
+          "annuite_dette": 2265681,
+          "depenses_invest": 4569647,
+          "pop_dgf": 4914
         },
         {
           "year": 2019,
-          "recettes_fonct": 11365883.17,
-          "depenses_fonct": 9283690.52,
-          "epargne_brute": 2082192.65,
-          "dette": 14024359.79,
-          "equipement": 4951628.45,
-          "frais_personnel": 5081508.32,
-          "impots_locaux": 7862901.0,
-          "dgf": 243672.0,
-          "annuite_dette": 2086538.51,
-          "depenses_invest": 6750041.58,
-          "pop_dgf": 4914.0
+          "recettes_fonct": 11365883,
+          "depenses_fonct": 9283691,
+          "epargne_brute": 2082193,
+          "dette": 14024360,
+          "equipement": 4951628,
+          "frais_personnel": 5081508,
+          "impots_locaux": 7862901,
+          "dgf": 243672,
+          "annuite_dette": 2086539,
+          "depenses_invest": 6750042,
+          "pop_dgf": 4914
         },
         {
           "year": 2020,
-          "recettes_fonct": 10916861.14,
-          "depenses_fonct": 8458614.63,
-          "epargne_brute": 2458246.51,
-          "dette": 14004540.08,
-          "equipement": 2045701.08,
-          "frais_personnel": 4913454.88,
-          "impots_locaux": 7879789.0,
-          "dgf": 173525.0,
-          "annuite_dette": 2130387.95,
-          "depenses_invest": 3991126.34,
-          "pop_dgf": 4914.0
+          "recettes_fonct": 10916861,
+          "depenses_fonct": 8458615,
+          "epargne_brute": 2458247,
+          "dette": 14004540,
+          "equipement": 2045701,
+          "frais_personnel": 4913455,
+          "impots_locaux": 7879789,
+          "dgf": 173525,
+          "annuite_dette": 2130388,
+          "depenses_invest": 3991126,
+          "pop_dgf": 4914
         },
         {
           "year": 2021,
-          "recettes_fonct": 11099633.83,
-          "depenses_fonct": 8664239.56,
-          "epargne_brute": 2435394.27,
-          "dette": 13543821.82,
-          "equipement": 3033606.74,
-          "frais_personnel": 4864538.89,
-          "impots_locaux": 7264429.0,
-          "dgf": 98851.0,
-          "annuite_dette": 2105904.64,
-          "depenses_invest": 4937448.68,
-          "pop_dgf": 4914.0
+          "recettes_fonct": 11099634,
+          "depenses_fonct": 8664240,
+          "epargne_brute": 2435394,
+          "dette": 13543822,
+          "equipement": 3033607,
+          "frais_personnel": 4864539,
+          "impots_locaux": 7264429,
+          "dgf": 98851,
+          "annuite_dette": 2105905,
+          "depenses_invest": 4937449,
+          "pop_dgf": 4914
         },
         {
           "year": 2022,
-          "recettes_fonct": 11127298.83,
-          "depenses_fonct": 9008845.6,
-          "epargne_brute": 2118453.23,
-          "dette": 12930855.17,
-          "equipement": 4840968.72,
-          "frais_personnel": 5134986.5,
-          "impots_locaux": 7082295.0,
-          "dgf": 41490.0,
-          "annuite_dette": 2212882.27,
-          "depenses_invest": 6945858.26,
-          "pop_dgf": 4914.0
+          "recettes_fonct": 11127299,
+          "depenses_fonct": 9008846,
+          "epargne_brute": 2118453,
+          "dette": 12930855,
+          "equipement": 4840969,
+          "frais_personnel": 5134986,
+          "impots_locaux": 7082295,
+          "dgf": 41490,
+          "annuite_dette": 2212882,
+          "depenses_invest": 6945858,
+          "pop_dgf": 4914
         },
         {
           "year": 2023,
-          "recettes_fonct": 11623618.32,
-          "depenses_fonct": 9520662.8,
-          "epargne_brute": 2102955.52,
-          "dette": 12722275.46,
-          "equipement": 4645069.66,
-          "frais_personnel": 5178371.01,
-          "impots_locaux": 7349025.0,
-          "dgf": 47823.0,
-          "annuite_dette": 2319625.55,
-          "depenses_invest": 6755566.78,
-          "pop_dgf": 4914.0
+          "recettes_fonct": 11623618,
+          "depenses_fonct": 9520663,
+          "epargne_brute": 2102956,
+          "dette": 12722275,
+          "equipement": 4645070,
+          "frais_personnel": 5178371,
+          "impots_locaux": 7349025,
+          "dgf": 47823,
+          "annuite_dette": 2319626,
+          "depenses_invest": 6755567,
+          "pop_dgf": 4914
         },
         {
           "year": 2024,
-          "recettes_fonct": 12020005.6,
-          "depenses_fonct": 9463063.47,
-          "epargne_brute": 2556942.13,
-          "dette": 12299826.26,
-          "equipement": 2153726.71,
-          "frais_personnel": 5239537.17,
-          "impots_locaux": 7507939.0,
-          "dgf": 53012.0,
-          "annuite_dette": 1967456.13,
-          "depenses_invest": 3993590.94,
-          "pop_dgf": 4914.0
+          "recettes_fonct": 12020006,
+          "depenses_fonct": 9463063,
+          "epargne_brute": 2556942,
+          "dette": 12299826,
+          "equipement": 2153727,
+          "frais_personnel": 5239537,
+          "impots_locaux": 7507939,
+          "dgf": 53012,
+          "annuite_dette": 1967456,
+          "depenses_invest": 3993591,
+          "pop_dgf": 4914
         }
       ]
     },
@@ -1186,116 +682,354 @@
       "commune": "Venarey-les-Laumes",
       "series": [
         {
+          "year": 2000,
+          "recettes_fonct": 2998000,
+          "depenses_fonct": 2342000,
+          "epargne_brute": 695000,
+          "dette": 3200000,
+          "equipement": 1174000,
+          "frais_personnel": 901000,
+          "impots_locaux": 1293000,
+          "annuite_dette": 0,
+          "depenses_invest": 1898000,
+          "dgf": null,
+          "pop_dgf": 3372
+        },
+        {
+          "year": 2001,
+          "recettes_fonct": 2739000,
+          "depenses_fonct": 2175000,
+          "epargne_brute": 641000,
+          "dette": 3206000,
+          "equipement": 1720000,
+          "frais_personnel": 922000,
+          "impots_locaux": 1285000,
+          "annuite_dette": 0,
+          "depenses_invest": 2110000,
+          "dgf": null,
+          "pop_dgf": 3372
+        },
+        {
+          "year": 2002,
+          "recettes_fonct": 3010000,
+          "depenses_fonct": 2675000,
+          "epargne_brute": 439000,
+          "dette": 2729000,
+          "equipement": 1190000,
+          "frais_personnel": 1066000,
+          "impots_locaux": 1229000,
+          "annuite_dette": 0,
+          "depenses_invest": 2049000,
+          "dgf": null,
+          "pop_dgf": 3372
+        },
+        {
+          "year": 2003,
+          "recettes_fonct": 2839000,
+          "depenses_fonct": 2396000,
+          "epargne_brute": 550000,
+          "dette": 2274000,
+          "equipement": 1026000,
+          "frais_personnel": 1096000,
+          "impots_locaux": 1315000,
+          "annuite_dette": 0,
+          "depenses_invest": 1528000,
+          "dgf": null,
+          "pop_dgf": 3372
+        },
+        {
+          "year": 2004,
+          "recettes_fonct": 2982000,
+          "depenses_fonct": 2318000,
+          "epargne_brute": 789000,
+          "dette": 2092000,
+          "equipement": 581000,
+          "frais_personnel": 1101000,
+          "impots_locaux": 1372000,
+          "annuite_dette": 0,
+          "depenses_invest": 1699000,
+          "dgf": null,
+          "pop_dgf": 3372
+        },
+        {
+          "year": 2005,
+          "recettes_fonct": 2929000,
+          "depenses_fonct": 2330000,
+          "epargne_brute": 756000,
+          "dette": 2171000,
+          "equipement": 796000,
+          "frais_personnel": 1165000,
+          "impots_locaux": 1425000,
+          "annuite_dette": 0,
+          "depenses_invest": 1001000,
+          "dgf": null,
+          "pop_dgf": 3372
+        },
+        {
+          "year": 2006,
+          "recettes_fonct": 3373000,
+          "depenses_fonct": 2578000,
+          "epargne_brute": 917000,
+          "dette": 2982000,
+          "equipement": 2341000,
+          "frais_personnel": 1147000,
+          "impots_locaux": 1507000,
+          "annuite_dette": 0,
+          "depenses_invest": 2637000,
+          "dgf": null,
+          "pop_dgf": 3372
+        },
+        {
+          "year": 2007,
+          "recettes_fonct": 3221000,
+          "depenses_fonct": 2462000,
+          "epargne_brute": 864000,
+          "dette": 4773000,
+          "equipement": 2538000,
+          "frais_personnel": 1124000,
+          "impots_locaux": 1548000,
+          "annuite_dette": 0,
+          "depenses_invest": 2747000,
+          "dgf": null,
+          "pop_dgf": 3372
+        },
+        {
+          "year": 2008,
+          "recettes_fonct": 3402000,
+          "depenses_fonct": 2857000,
+          "epargne_brute": 667000,
+          "dette": 4519000,
+          "equipement": 2966000,
+          "frais_personnel": 1172000,
+          "impots_locaux": 1637000,
+          "annuite_dette": 0,
+          "depenses_invest": 3220000,
+          "dgf": null,
+          "pop_dgf": 3372
+        },
+        {
+          "year": 2009,
+          "recettes_fonct": 3463000,
+          "depenses_fonct": 2710000,
+          "epargne_brute": 858000,
+          "dette": 4276000,
+          "equipement": 1118000,
+          "frais_personnel": 1234000,
+          "impots_locaux": 1756000,
+          "annuite_dette": 0,
+          "depenses_invest": 1361000,
+          "dgf": null,
+          "pop_dgf": 3146
+        },
+        {
+          "year": 2010,
+          "recettes_fonct": 3590000,
+          "depenses_fonct": 2712000,
+          "epargne_brute": 975000,
+          "dette": 4010000,
+          "equipement": 490000,
+          "frais_personnel": 1229000,
+          "impots_locaux": 1857000,
+          "annuite_dette": 405000,
+          "depenses_invest": 743000,
+          "dgf": null,
+          "pop_dgf": 3128
+        },
+        {
+          "year": 2011,
+          "recettes_fonct": 3696000,
+          "depenses_fonct": 2711000,
+          "epargne_brute": 1068000,
+          "dette": 3767000,
+          "equipement": 1341000,
+          "frais_personnel": 1223000,
+          "impots_locaux": 1944000,
+          "annuite_dette": 405000,
+          "depenses_invest": 1601000,
+          "dgf": null,
+          "pop_dgf": 3122
+        },
+        {
+          "year": 2012,
+          "recettes_fonct": 3777000,
+          "depenses_fonct": 2848000,
+          "epargne_brute": 1020000,
+          "dette": 4488000,
+          "equipement": 1263000,
+          "frais_personnel": 1323000,
+          "impots_locaux": 2041000,
+          "annuite_dette": 450000,
+          "depenses_invest": 1545000,
+          "dgf": null,
+          "pop_dgf": 3062
+        },
+        {
+          "year": 2013,
+          "recettes_fonct": 3884000,
+          "depenses_fonct": 3006000,
+          "epargne_brute": 974000,
+          "dette": 4171000,
+          "equipement": 4059000,
+          "frais_personnel": 1354000,
+          "impots_locaux": 2036000,
+          "annuite_dette": 495000,
+          "depenses_invest": 4380000,
+          "dgf": null,
+          "pop_dgf": 3018
+        },
+        {
+          "year": 2014,
+          "recettes_fonct": 3812000,
+          "depenses_fonct": 2990000,
+          "epargne_brute": 926000,
+          "dette": 4822000,
+          "equipement": 2948000,
+          "frais_personnel": 1368000,
+          "impots_locaux": 1984000,
+          "annuite_dette": 516000,
+          "depenses_invest": 3298000,
+          "dgf": null,
+          "pop_dgf": 2973
+        },
+        {
+          "year": 2015,
+          "recettes_fonct": 3878000,
+          "depenses_fonct": 2856000,
+          "epargne_brute": 1146000,
+          "dette": 4489000,
+          "equipement": 1163000,
+          "frais_personnel": 1343000,
+          "impots_locaux": 2138000,
+          "annuite_dette": 502000,
+          "depenses_invest": 1498000,
+          "dgf": null,
+          "pop_dgf": 2967
+        },
+        {
+          "year": 2016,
+          "recettes_fonct": 3811000,
+          "depenses_fonct": 2811000,
+          "epargne_brute": 1180000,
+          "dette": 4212000,
+          "equipement": 750000,
+          "frais_personnel": 1237000,
+          "impots_locaux": 2224000,
+          "annuite_dette": 434000,
+          "depenses_invest": 1029000,
+          "dgf": null,
+          "pop_dgf": 2959
+        },
+        {
           "year": 2017,
-          "recettes_fonct": 3763985.23,
-          "depenses_fonct": 2741161.54,
-          "epargne_brute": 1022823.69,
-          "dette": 3932166.11,
-          "equipement": 2262954.62,
-          "frais_personnel": 1303211.16,
-          "impots_locaux": 2200350.0,
-          "dgf": 560948.0,
-          "annuite_dette": 428245.93,
-          "depenses_invest": 2551083.41,
-          "pop_dgf": 2825.0
+          "recettes_fonct": 3763985,
+          "depenses_fonct": 2741162,
+          "epargne_brute": 1022824,
+          "dette": 3932166,
+          "equipement": 2262955,
+          "frais_personnel": 1303211,
+          "impots_locaux": 2200350,
+          "dgf": 560948,
+          "annuite_dette": 428246,
+          "depenses_invest": 2551083,
+          "pop_dgf": 2825
         },
         {
           "year": 2018,
-          "recettes_fonct": 3717329.14,
-          "depenses_fonct": 2674699.35,
-          "epargne_brute": 1042629.79,
-          "dette": 3668429.18,
-          "equipement": 1736648.66,
-          "frais_personnel": 1308683.0,
-          "impots_locaux": 2339747.0,
-          "dgf": 418389.0,
-          "annuite_dette": 400952.85,
-          "depenses_invest": 2204679.26,
-          "pop_dgf": 2825.0
+          "recettes_fonct": 3717329,
+          "depenses_fonct": 2674699,
+          "epargne_brute": 1042630,
+          "dette": 3668429,
+          "equipement": 1736649,
+          "frais_personnel": 1308683,
+          "impots_locaux": 2339747,
+          "dgf": 418389,
+          "annuite_dette": 400953,
+          "depenses_invest": 2204679,
+          "pop_dgf": 2825
         },
         {
           "year": 2019,
-          "recettes_fonct": 3853871.49,
-          "depenses_fonct": 3076363.14,
-          "epargne_brute": 777508.35,
-          "dette": 3362874.94,
-          "equipement": 1333307.4,
-          "frais_personnel": 1358471.88,
-          "impots_locaux": 2321043.73,
-          "dgf": 416002.0,
-          "annuite_dette": 430706.98,
-          "depenses_invest": 1725071.93,
-          "pop_dgf": 2825.0
+          "recettes_fonct": 3853871,
+          "depenses_fonct": 3076363,
+          "epargne_brute": 777508,
+          "dette": 3362875,
+          "equipement": 1333307,
+          "frais_personnel": 1358472,
+          "impots_locaux": 2321044,
+          "dgf": 416002,
+          "annuite_dette": 430707,
+          "depenses_invest": 1725072,
+          "pop_dgf": 2825
         },
         {
           "year": 2020,
-          "recettes_fonct": 4678109.93,
-          "depenses_fonct": 2990239.3,
-          "epargne_brute": 1687870.63,
-          "dette": 3063155.24,
-          "equipement": 1738096.8,
-          "frais_personnel": 1335714.32,
-          "impots_locaux": 2309699.96,
-          "dgf": 416193.0,
-          "annuite_dette": 415231.02,
-          "depenses_invest": 2155316.5,
-          "pop_dgf": 2825.0
+          "recettes_fonct": 4678110,
+          "depenses_fonct": 2990239,
+          "epargne_brute": 1687871,
+          "dette": 3063155,
+          "equipement": 1738097,
+          "frais_personnel": 1335714,
+          "impots_locaux": 2309700,
+          "dgf": 416193,
+          "annuite_dette": 415231,
+          "depenses_invest": 2155316,
+          "pop_dgf": 2825
         },
         {
           "year": 2021,
-          "recettes_fonct": 3733631.87,
-          "depenses_fonct": 2788588.16,
-          "epargne_brute": 945043.71,
-          "dette": 2791243.18,
-          "equipement": 1105095.22,
-          "frais_personnel": 1267099.09,
-          "impots_locaux": 2076331.0,
-          "dgf": 411370.0,
-          "annuite_dette": 377280.2,
-          "depenses_invest": 1449590.76,
-          "pop_dgf": 2825.0
+          "recettes_fonct": 3733632,
+          "depenses_fonct": 2788588,
+          "epargne_brute": 945044,
+          "dette": 2791243,
+          "equipement": 1105095,
+          "frais_personnel": 1267099,
+          "impots_locaux": 2076331,
+          "dgf": 411370,
+          "annuite_dette": 377280,
+          "depenses_invest": 1449591,
+          "pop_dgf": 2825
         },
         {
           "year": 2022,
-          "recettes_fonct": 4096254.5,
-          "depenses_fonct": 3135129.38,
-          "epargne_brute": 961125.12,
-          "dette": 2509607.41,
-          "equipement": 4249350.25,
-          "frais_personnel": 1423337.32,
-          "impots_locaux": 2272214.0,
-          "dgf": 405332.0,
-          "annuite_dette": 379289.88,
-          "depenses_invest": 4581055.71,
-          "pop_dgf": 2825.0
+          "recettes_fonct": 4096254,
+          "depenses_fonct": 3135129,
+          "epargne_brute": 961125,
+          "dette": 2509607,
+          "equipement": 4249350,
+          "frais_personnel": 1423337,
+          "impots_locaux": 2272214,
+          "dgf": 405332,
+          "annuite_dette": 379290,
+          "depenses_invest": 4581056,
+          "pop_dgf": 2825
         },
         {
           "year": 2023,
-          "recettes_fonct": 5044373.64,
-          "depenses_fonct": 3321483.69,
-          "epargne_brute": 1722889.95,
-          "dette": 4015561.82,
-          "equipement": 8187161.24,
-          "frais_personnel": 1496798.44,
-          "impots_locaux": 2433149.0,
-          "dgf": 422671.0,
-          "annuite_dette": 377851.2,
-          "depenses_invest": 8579387.5,
-          "pop_dgf": 2825.0
+          "recettes_fonct": 5044374,
+          "depenses_fonct": 3321484,
+          "epargne_brute": 1722890,
+          "dette": 4015562,
+          "equipement": 8187161,
+          "frais_personnel": 1496798,
+          "impots_locaux": 2433149,
+          "dgf": 422671,
+          "annuite_dette": 377851,
+          "depenses_invest": 8579388,
+          "pop_dgf": 2825
         },
         {
           "year": 2024,
-          "recettes_fonct": 4335552.86,
-          "depenses_fonct": 3405532.66,
-          "epargne_brute": 930020.2,
-          "dette": 4311202.5,
-          "equipement": 1800119.95,
-          "frais_personnel": 1462726.88,
-          "impots_locaux": 2500045.0,
-          "dgf": 414111.0,
-          "annuite_dette": 462009.63,
-          "depenses_invest": 2402229.3,
-          "pop_dgf": 2825.0
+          "recettes_fonct": 4335553,
+          "depenses_fonct": 3405533,
+          "epargne_brute": 930020,
+          "dette": 4311202,
+          "equipement": 1800120,
+          "frais_personnel": 1462727,
+          "impots_locaux": 2500045,
+          "dgf": 414111,
+          "annuite_dette": 462010,
+          "depenses_invest": 2402229,
+          "pop_dgf": 2825
         }
       ]
     },
@@ -1303,116 +1037,354 @@
       "commune": "Semur-en-Auxois",
       "series": [
         {
+          "year": 2000,
+          "recettes_fonct": 5007000,
+          "depenses_fonct": 4279000,
+          "epargne_brute": 835000,
+          "dette": 6700000,
+          "equipement": 3407000,
+          "frais_personnel": 1391000,
+          "impots_locaux": 2190000,
+          "annuite_dette": 0,
+          "depenses_invest": 4025000,
+          "dgf": null,
+          "pop_dgf": 5012
+        },
+        {
+          "year": 2001,
+          "recettes_fonct": 4758000,
+          "depenses_fonct": 4341000,
+          "epargne_brute": 457000,
+          "dette": 6491000,
+          "equipement": 3850000,
+          "frais_personnel": 1472000,
+          "impots_locaux": 2035000,
+          "annuite_dette": 0,
+          "depenses_invest": 4335000,
+          "dgf": null,
+          "pop_dgf": 5012
+        },
+        {
+          "year": 2002,
+          "recettes_fonct": 4781000,
+          "depenses_fonct": 4120000,
+          "epargne_brute": 744000,
+          "dette": 6478000,
+          "equipement": 1747000,
+          "frais_personnel": 1537000,
+          "impots_locaux": 2018000,
+          "annuite_dette": 0,
+          "depenses_invest": 2836000,
+          "dgf": null,
+          "pop_dgf": 5012
+        },
+        {
+          "year": 2003,
+          "recettes_fonct": 4997000,
+          "depenses_fonct": 5000000,
+          "epargne_brute": 961000,
+          "dette": 6608000,
+          "equipement": 1745000,
+          "frais_personnel": 1546000,
+          "impots_locaux": 2189000,
+          "annuite_dette": 0,
+          "depenses_invest": 3319000,
+          "dgf": null,
+          "pop_dgf": 5012
+        },
+        {
+          "year": 2004,
+          "recettes_fonct": 5634000,
+          "depenses_fonct": 4832000,
+          "epargne_brute": 910000,
+          "dette": 6249000,
+          "equipement": 2572000,
+          "frais_personnel": 1592000,
+          "impots_locaux": 2290000,
+          "annuite_dette": 0,
+          "depenses_invest": 3221000,
+          "dgf": null,
+          "pop_dgf": 5012
+        },
+        {
+          "year": 2005,
+          "recettes_fonct": 6016000,
+          "depenses_fonct": 5383000,
+          "epargne_brute": 861000,
+          "dette": 6389000,
+          "equipement": 2624000,
+          "frais_personnel": 1756000,
+          "impots_locaux": 2401000,
+          "annuite_dette": 0,
+          "depenses_invest": 3149000,
+          "dgf": null,
+          "pop_dgf": 5012
+        },
+        {
+          "year": 2006,
+          "recettes_fonct": 6102000,
+          "depenses_fonct": 5294000,
+          "epargne_brute": 992000,
+          "dette": 6897000,
+          "equipement": 4007000,
+          "frais_personnel": 1821000,
+          "impots_locaux": 2556000,
+          "annuite_dette": 0,
+          "depenses_invest": 4856000,
+          "dgf": null,
+          "pop_dgf": 5012
+        },
+        {
+          "year": 2007,
+          "recettes_fonct": 6734000,
+          "depenses_fonct": 5917000,
+          "epargne_brute": 942000,
+          "dette": 6894000,
+          "equipement": 1763000,
+          "frais_personnel": 1966000,
+          "impots_locaux": 2630000,
+          "annuite_dette": 0,
+          "depenses_invest": 2369000,
+          "dgf": null,
+          "pop_dgf": 5012
+        },
+        {
+          "year": 2008,
+          "recettes_fonct": 6965000,
+          "depenses_fonct": 6386000,
+          "epargne_brute": 793000,
+          "dette": 6240000,
+          "equipement": 1466000,
+          "frais_personnel": 1995000,
+          "impots_locaux": 2808000,
+          "annuite_dette": 0,
+          "depenses_invest": 2245000,
+          "dgf": null,
+          "pop_dgf": 5012
+        },
+        {
+          "year": 2009,
+          "recettes_fonct": 6157000,
+          "depenses_fonct": 5642000,
+          "epargne_brute": 715000,
+          "dette": 5741000,
+          "equipement": 1945000,
+          "frais_personnel": 2295000,
+          "impots_locaux": 3030000,
+          "annuite_dette": 0,
+          "depenses_invest": 2529000,
+          "dgf": null,
+          "pop_dgf": 4650
+        },
+        {
+          "year": 2010,
+          "recettes_fonct": 6630000,
+          "depenses_fonct": 6290000,
+          "epargne_brute": 547000,
+          "dette": 6061000,
+          "equipement": 1143000,
+          "frais_personnel": 2304000,
+          "impots_locaux": 3167000,
+          "annuite_dette": 685000,
+          "depenses_invest": 2147000,
+          "dgf": null,
+          "pop_dgf": 4568
+        },
+        {
+          "year": 2011,
+          "recettes_fonct": 6311000,
+          "depenses_fonct": 6056000,
+          "epargne_brute": 462000,
+          "dette": 6419000,
+          "equipement": 1806000,
+          "frais_personnel": 2163000,
+          "impots_locaux": 3290000,
+          "annuite_dette": 675000,
+          "depenses_invest": 2484000,
+          "dgf": null,
+          "pop_dgf": 4615
+        },
+        {
+          "year": 2012,
+          "recettes_fonct": 6333000,
+          "depenses_fonct": 5976000,
+          "epargne_brute": 574000,
+          "dette": 6311000,
+          "equipement": 1574000,
+          "frais_personnel": 2133000,
+          "impots_locaux": 3187000,
+          "annuite_dette": 670000,
+          "depenses_invest": 2450000,
+          "dgf": null,
+          "pop_dgf": 4636
+        },
+        {
+          "year": 2013,
+          "recettes_fonct": 6653000,
+          "depenses_fonct": 6058000,
+          "epargne_brute": 842000,
+          "dette": 5817000,
+          "equipement": 1301000,
+          "frais_personnel": 2096000,
+          "impots_locaux": 3327000,
+          "annuite_dette": 659000,
+          "depenses_invest": 2049000,
+          "dgf": null,
+          "pop_dgf": 4610
+        },
+        {
+          "year": 2014,
+          "recettes_fonct": 6313000,
+          "depenses_fonct": 5786000,
+          "epargne_brute": 773000,
+          "dette": 6976000,
+          "equipement": 1283000,
+          "frais_personnel": 2247000,
+          "impots_locaux": 3497000,
+          "annuite_dette": 733000,
+          "depenses_invest": 1947000,
+          "dgf": null,
+          "pop_dgf": 4573
+        },
+        {
+          "year": 2015,
+          "recettes_fonct": 6665000,
+          "depenses_fonct": 6182000,
+          "epargne_brute": 768000,
+          "dette": 6466000,
+          "equipement": 1628000,
+          "frais_personnel": 2564000,
+          "impots_locaux": 3516000,
+          "annuite_dette": 699000,
+          "depenses_invest": 2278000,
+          "dgf": null,
+          "pop_dgf": 4539
+        },
+        {
+          "year": 2016,
+          "recettes_fonct": 6495000,
+          "depenses_fonct": 6363000,
+          "epargne_brute": 463000,
+          "dette": 6782000,
+          "equipement": 1456000,
+          "frais_personnel": 2627000,
+          "impots_locaux": 3569000,
+          "annuite_dette": 710000,
+          "depenses_invest": 2044000,
+          "dgf": null,
+          "pop_dgf": 4506
+        },
+        {
           "year": 2017,
-          "recettes_fonct": 5779494.97,
-          "depenses_fonct": 5391853.63,
-          "epargne_brute": 387641.34,
-          "dette": 6227582.36,
-          "equipement": 2014720.57,
-          "frais_personnel": 2686154.77,
-          "impots_locaux": 3734858.0,
-          "dgf": 765227.0,
-          "annuite_dette": 735400.27,
-          "depenses_invest": 2928839.57,
-          "pop_dgf": 4380.0
+          "recettes_fonct": 5779495,
+          "depenses_fonct": 5391854,
+          "epargne_brute": 387641,
+          "dette": 6227582,
+          "equipement": 2014721,
+          "frais_personnel": 2686155,
+          "impots_locaux": 3734858,
+          "dgf": 765227,
+          "annuite_dette": 735400,
+          "depenses_invest": 2928840,
+          "pop_dgf": 4380
         },
         {
           "year": 2018,
-          "recettes_fonct": 5352370.63,
-          "depenses_fonct": 5058863.32,
-          "epargne_brute": 293507.310000001,
-          "dette": 6450280.21,
-          "equipement": 1185635.5,
-          "frais_personnel": 2557350.44,
-          "impots_locaux": 3410846.65,
-          "dgf": 765891.0,
-          "annuite_dette": 742639.73,
-          "depenses_invest": 2000798.36,
-          "pop_dgf": 4380.0
+          "recettes_fonct": 5352371,
+          "depenses_fonct": 5058863,
+          "epargne_brute": 293507,
+          "dette": 6450280,
+          "equipement": 1185636,
+          "frais_personnel": 2557350,
+          "impots_locaux": 3410847,
+          "dgf": 765891,
+          "annuite_dette": 742640,
+          "depenses_invest": 2000798,
+          "pop_dgf": 4380
         },
         {
           "year": 2019,
-          "recettes_fonct": 5451515.46,
-          "depenses_fonct": 5055410.6,
-          "epargne_brute": 396104.86,
-          "dette": 10985873.7,
-          "equipement": 567445.74,
-          "frais_personnel": 2586854.1,
-          "impots_locaux": 3274531.29,
-          "dgf": 785023.0,
-          "annuite_dette": 861750.48,
-          "depenses_invest": 1428576.63,
-          "pop_dgf": 4380.0
+          "recettes_fonct": 5451515,
+          "depenses_fonct": 5055411,
+          "epargne_brute": 396105,
+          "dette": 10985874,
+          "equipement": 567446,
+          "frais_personnel": 2586854,
+          "impots_locaux": 3274531,
+          "dgf": 785023,
+          "annuite_dette": 861750,
+          "depenses_invest": 1428577,
+          "pop_dgf": 4380
         },
         {
           "year": 2020,
-          "recettes_fonct": 5367021.35,
-          "depenses_fonct": 4705991.01,
-          "epargne_brute": 661030.34,
-          "dette": 7514460.16,
-          "equipement": 456823.64,
-          "frais_personnel": 2515823.1,
-          "impots_locaux": 3282764.29,
-          "dgf": 806231.0,
-          "annuite_dette": 2420023.71,
-          "depenses_invest": 2822053.44,
-          "pop_dgf": 4380.0
+          "recettes_fonct": 5367021,
+          "depenses_fonct": 4705991,
+          "epargne_brute": 661030,
+          "dette": 7514460,
+          "equipement": 456824,
+          "frais_personnel": 2515823,
+          "impots_locaux": 3282764,
+          "dgf": 806231,
+          "annuite_dette": 2420024,
+          "depenses_invest": 2822053,
+          "pop_dgf": 4380
         },
         {
           "year": 2021,
-          "recettes_fonct": 5415783.53,
-          "depenses_fonct": 4590864.96,
-          "epargne_brute": 824918.57,
-          "dette": 6855171.32,
-          "equipement": 562722.65,
-          "frais_personnel": 2431128.98,
-          "impots_locaux": 3136920.2,
-          "dgf": 819416.0,
-          "annuite_dette": 817881.39,
-          "depenses_invest": 1260859.63,
-          "pop_dgf": 4380.0
+          "recettes_fonct": 5415784,
+          "depenses_fonct": 4590865,
+          "epargne_brute": 824919,
+          "dette": 6855171,
+          "equipement": 562723,
+          "frais_personnel": 2431129,
+          "impots_locaux": 3136920,
+          "dgf": 819416,
+          "annuite_dette": 817881,
+          "depenses_invest": 1260860,
+          "pop_dgf": 4380
         },
         {
           "year": 2022,
-          "recettes_fonct": 5676509.29,
-          "depenses_fonct": 5844315.12,
-          "epargne_brute": -167805.83,
-          "dette": 6358382.93,
-          "equipement": 962049.95,
-          "frais_personnel": 2487503.54,
-          "impots_locaux": 3220639.2,
-          "dgf": 826882.0,
-          "annuite_dette": 678601.43,
-          "depenses_invest": 1580344.36,
-          "pop_dgf": 4380.0
+          "recettes_fonct": 5676509,
+          "depenses_fonct": 5844315,
+          "epargne_brute": -167806,
+          "dette": 6358383,
+          "equipement": 962050,
+          "frais_personnel": 2487504,
+          "impots_locaux": 3220639,
+          "dgf": 826882,
+          "annuite_dette": 678601,
+          "depenses_invest": 1580344,
+          "pop_dgf": 4380
         },
         {
           "year": 2023,
-          "recettes_fonct": 5988501.41,
-          "depenses_fonct": 5114192.45,
-          "epargne_brute": 874308.96,
-          "dette": 6251215.89,
-          "equipement": 545017.08,
-          "frais_personnel": 2641586.52,
-          "impots_locaux": 3365394.81,
-          "dgf": 862324.0,
-          "annuite_dette": 681418.62,
-          "depenses_invest": 1082326.64,
-          "pop_dgf": 4380.0
+          "recettes_fonct": 5988501,
+          "depenses_fonct": 5114192,
+          "epargne_brute": 874309,
+          "dette": 6251216,
+          "equipement": 545017,
+          "frais_personnel": 2641587,
+          "impots_locaux": 3365395,
+          "dgf": 862324,
+          "annuite_dette": 681419,
+          "depenses_invest": 1082327,
+          "pop_dgf": 4380
         },
         {
           "year": 2024,
-          "recettes_fonct": 6176317.25,
-          "depenses_fonct": 5234262.2,
-          "epargne_brute": 942055.05,
-          "dette": 6627431.68,
-          "equipement": 647350.57,
-          "frais_personnel": 2753097.53,
-          "impots_locaux": 3479739.81,
-          "dgf": 879263.0,
-          "annuite_dette": 651324.56,
-          "depenses_invest": 1195336.76,
-          "pop_dgf": 4380.0
+          "recettes_fonct": 6176317,
+          "depenses_fonct": 5234262,
+          "epargne_brute": 942055,
+          "dette": 6627432,
+          "equipement": 647351,
+          "frais_personnel": 2753098,
+          "impots_locaux": 3479740,
+          "dgf": 879263,
+          "annuite_dette": 651325,
+          "depenses_invest": 1195337,
+          "pop_dgf": 4380
         }
       ]
     },
@@ -1420,240 +1392,356 @@
       "commune": "Châtillon-sur-Seine",
       "series": [
         {
+          "year": 2000,
+          "recettes_fonct": 7061000,
+          "depenses_fonct": 5317000,
+          "epargne_brute": 1878000,
+          "dette": 7787000,
+          "equipement": 1169000,
+          "frais_personnel": 1876000,
+          "impots_locaux": 3486000,
+          "annuite_dette": 0,
+          "depenses_invest": 2345000,
+          "dgf": null,
+          "pop_dgf": 6788
+        },
+        {
+          "year": 2001,
+          "recettes_fonct": 6995000,
+          "depenses_fonct": 4839000,
+          "epargne_brute": 2325000,
+          "dette": 6915000,
+          "equipement": 1203000,
+          "frais_personnel": 1943000,
+          "impots_locaux": 3439000,
+          "annuite_dette": 0,
+          "depenses_invest": 2319000,
+          "dgf": null,
+          "pop_dgf": 6788
+        },
+        {
+          "year": 2002,
+          "recettes_fonct": 7183000,
+          "depenses_fonct": 5339000,
+          "epargne_brute": 2007000,
+          "dette": 6127000,
+          "equipement": 1046000,
+          "frais_personnel": 2112000,
+          "impots_locaux": 3402000,
+          "annuite_dette": 0,
+          "depenses_invest": 2946000,
+          "dgf": null,
+          "pop_dgf": 6788
+        },
+        {
+          "year": 2003,
+          "recettes_fonct": 7575000,
+          "depenses_fonct": 5865000,
+          "epargne_brute": 1906000,
+          "dette": 5415000,
+          "equipement": 1712000,
+          "frais_personnel": 2233000,
+          "impots_locaux": 3527000,
+          "annuite_dette": 0,
+          "depenses_invest": 2601000,
+          "dgf": null,
+          "pop_dgf": 6788
+        },
+        {
+          "year": 2004,
+          "recettes_fonct": 7409000,
+          "depenses_fonct": 6088000,
+          "epargne_brute": 1491000,
+          "dette": 4733000,
+          "equipement": 1369000,
+          "frais_personnel": 2245000,
+          "impots_locaux": 3362000,
+          "annuite_dette": 0,
+          "depenses_invest": 2311000,
+          "dgf": null,
+          "pop_dgf": 6788
+        },
+        {
+          "year": 2005,
+          "recettes_fonct": 9262000,
+          "depenses_fonct": 8020000,
+          "epargne_brute": 1513000,
+          "dette": 6032000,
+          "equipement": 3363000,
+          "frais_personnel": 2366000,
+          "impots_locaux": 3211000,
+          "annuite_dette": 0,
+          "depenses_invest": 10618000,
+          "dgf": null,
+          "pop_dgf": 6788
+        },
+        {
+          "year": 2006,
+          "recettes_fonct": 8061000,
+          "depenses_fonct": 6198000,
+          "epargne_brute": 1992000,
+          "dette": 5297000,
+          "equipement": 1714000,
+          "frais_personnel": 2442000,
+          "impots_locaux": 3422000,
+          "annuite_dette": 0,
+          "depenses_invest": 2989000,
+          "dgf": null,
+          "pop_dgf": 6788
+        },
+        {
+          "year": 2007,
+          "recettes_fonct": 8530000,
+          "depenses_fonct": 6073000,
+          "epargne_brute": 2707000,
+          "dette": 4576000,
+          "equipement": 1763000,
+          "frais_personnel": 2491000,
+          "impots_locaux": 3515000,
+          "annuite_dette": 0,
+          "depenses_invest": 2519000,
+          "dgf": null,
+          "pop_dgf": 6788
+        },
+        {
+          "year": 2008,
+          "recettes_fonct": 8454000,
+          "depenses_fonct": 6000000,
+          "epargne_brute": 2650000,
+          "dette": 3892000,
+          "equipement": 1436000,
+          "frais_personnel": 2442000,
+          "impots_locaux": 3580000,
+          "annuite_dette": 0,
+          "depenses_invest": 2958000,
+          "dgf": null,
+          "pop_dgf": 6788
+        },
+        {
+          "year": 2009,
+          "recettes_fonct": 7820000,
+          "depenses_fonct": 5107000,
+          "epargne_brute": 2905000,
+          "dette": 3324000,
+          "equipement": 1968000,
+          "frais_personnel": 2307000,
+          "impots_locaux": 3788000,
+          "annuite_dette": 0,
+          "depenses_invest": 2536000,
+          "dgf": null,
+          "pop_dgf": 6297
+        },
+        {
+          "year": 2010,
+          "recettes_fonct": 7926000,
+          "depenses_fonct": 5055000,
+          "epargne_brute": 3059000,
+          "dette": 2943000,
+          "equipement": 2627000,
+          "frais_personnel": 2210000,
+          "impots_locaux": 3844000,
+          "annuite_dette": 506000,
+          "depenses_invest": 3028000,
+          "dgf": null,
+          "pop_dgf": 6257
+        },
+        {
+          "year": 2011,
+          "recettes_fonct": 7865000,
+          "depenses_fonct": 5164000,
+          "epargne_brute": 2885000,
+          "dette": 2642000,
+          "equipement": 6421000,
+          "frais_personnel": 2214000,
+          "impots_locaux": 3775000,
+          "annuite_dette": 411000,
+          "depenses_invest": 7390000,
+          "dgf": null,
+          "pop_dgf": 6172
+        },
+        {
+          "year": 2012,
+          "recettes_fonct": 7672000,
+          "depenses_fonct": 5754000,
+          "epargne_brute": 2137000,
+          "dette": 2358000,
+          "equipement": 3235000,
+          "frais_personnel": 2267000,
+          "impots_locaux": 3514000,
+          "annuite_dette": 379000,
+          "depenses_invest": 3524000,
+          "dgf": null,
+          "pop_dgf": 6080
+        },
+        {
+          "year": 2013,
+          "recettes_fonct": 8107000,
+          "depenses_fonct": 6058000,
+          "epargne_brute": 2472000,
+          "dette": 2064000,
+          "equipement": 2307000,
+          "frais_personnel": 2371000,
+          "impots_locaux": 3410000,
+          "annuite_dette": 379000,
+          "depenses_invest": 2622000,
+          "dgf": null,
+          "pop_dgf": 6030
+        },
+        {
+          "year": 2014,
+          "recettes_fonct": 7496000,
+          "depenses_fonct": 6438000,
+          "epargne_brute": 1528000,
+          "dette": 1766000,
+          "equipement": 2398000,
+          "frais_personnel": 2367000,
+          "impots_locaux": 3395000,
+          "annuite_dette": 372000,
+          "depenses_invest": 2708000,
+          "dgf": null,
+          "pop_dgf": 5979
+        },
+        {
+          "year": 2015,
+          "recettes_fonct": 7305000,
+          "depenses_fonct": 6356000,
+          "epargne_brute": 1448000,
+          "dette": 1454000,
+          "equipement": 1473000,
+          "frais_personnel": 2490000,
+          "impots_locaux": 3321000,
+          "annuite_dette": 372000,
+          "depenses_invest": 1791000,
+          "dgf": null,
+          "pop_dgf": 5951
+        },
+        {
+          "year": 2016,
+          "recettes_fonct": 7320000,
+          "depenses_fonct": 6183000,
+          "epargne_brute": 1626000,
+          "dette": 1161000,
+          "equipement": 2360000,
+          "frais_personnel": 2401000,
+          "impots_locaux": 3323000,
+          "annuite_dette": 341000,
+          "depenses_invest": 2654000,
+          "dgf": null,
+          "pop_dgf": 5942
+        },
+        {
           "year": 2017,
-          "recettes_fonct": 7066655.52,
-          "depenses_fonct": 5822496.21,
-          "epargne_brute": 1244159.31,
-          "dette": 870089.35,
-          "equipement": 1961422.97,
-          "frais_personnel": 2419369.78,
-          "impots_locaux": 3146292.0,
-          "dgf": 1514163.0,
-          "annuite_dette": 329453.26,
-          "depenses_invest": 2252546.03,
-          "pop_dgf": 5715.0
+          "recettes_fonct": 7066656,
+          "depenses_fonct": 5822496,
+          "epargne_brute": 1244159,
+          "dette": 870089,
+          "equipement": 1961423,
+          "frais_personnel": 2419370,
+          "impots_locaux": 3146292,
+          "dgf": 1514163,
+          "annuite_dette": 329453,
+          "depenses_invest": 2252546,
+          "pop_dgf": 5715
         },
         {
           "year": 2018,
-          "recettes_fonct": 7728873.63,
-          "depenses_fonct": 6050927.79,
-          "epargne_brute": 1677945.84,
-          "dette": 571616.54,
-          "equipement": 2037183.11,
-          "frais_personnel": 2488431.74,
-          "impots_locaux": 3345722.0,
-          "dgf": 1502413.0,
-          "annuite_dette": 329362.46,
-          "depenses_invest": 2716092.92,
-          "pop_dgf": 5715.0
+          "recettes_fonct": 7728874,
+          "depenses_fonct": 6050928,
+          "epargne_brute": 1677946,
+          "dette": 571617,
+          "equipement": 2037183,
+          "frais_personnel": 2488432,
+          "impots_locaux": 3345722,
+          "dgf": 1502413,
+          "annuite_dette": 329362,
+          "depenses_invest": 2716093,
+          "pop_dgf": 5715
         },
         {
           "year": 2019,
-          "recettes_fonct": 7981490.11,
-          "depenses_fonct": 5573969.29,
-          "epargne_brute": 2407520.82,
-          "dette": 282078.99,
-          "equipement": 1401924.4,
-          "frais_personnel": 2328422.98,
-          "impots_locaux": 3410051.15,
-          "dgf": 1520428.0,
-          "annuite_dette": 307542.33,
-          "depenses_invest": 1717147.03,
-          "pop_dgf": 5715.0
+          "recettes_fonct": 7981490,
+          "depenses_fonct": 5573969,
+          "epargne_brute": 2407521,
+          "dette": 282079,
+          "equipement": 1401924,
+          "frais_personnel": 2328423,
+          "impots_locaux": 3410051,
+          "dgf": 1520428,
+          "annuite_dette": 307542,
+          "depenses_invest": 1717147,
+          "pop_dgf": 5715
         },
         {
           "year": 2020,
-          "recettes_fonct": 6630644.84,
-          "depenses_fonct": 5180982.95,
-          "epargne_brute": 1449661.89,
-          "dette": 20293.11,
-          "equipement": 3524931.69,
-          "frais_personnel": 2221865.14,
-          "impots_locaux": 3384852.0,
-          "dgf": 1489457.5,
-          "annuite_dette": 272423.57,
-          "depenses_invest": 3913462.38,
-          "pop_dgf": 5715.0
+          "recettes_fonct": 6630645,
+          "depenses_fonct": 5180983,
+          "epargne_brute": 1449662,
+          "dette": 20293,
+          "equipement": 3524932,
+          "frais_personnel": 2221865,
+          "impots_locaux": 3384852,
+          "dgf": 1489458,
+          "annuite_dette": 272424,
+          "depenses_invest": 3913462,
+          "pop_dgf": 5715
         },
         {
           "year": 2021,
-          "recettes_fonct": 6793776.61,
-          "depenses_fonct": 5011646.41,
-          "epargne_brute": 1782130.2,
-          "dette": 20494.68,
-          "equipement": 3452943.82,
-          "frais_personnel": 2174907.79,
-          "impots_locaux": 3541926.88,
-          "dgf": 1480099.0,
-          "annuite_dette": 1837.59,
-          "depenses_invest": 3547394.06,
-          "pop_dgf": 5715.0
+          "recettes_fonct": 6793777,
+          "depenses_fonct": 5011646,
+          "epargne_brute": 1782130,
+          "dette": 20495,
+          "equipement": 3452944,
+          "frais_personnel": 2174908,
+          "impots_locaux": 3541927,
+          "dgf": 1480099,
+          "annuite_dette": 1838,
+          "depenses_invest": 3547394,
+          "pop_dgf": 5715
         },
         {
           "year": 2022,
-          "recettes_fonct": 7095584.37,
-          "depenses_fonct": 6293487.76,
-          "epargne_brute": 802096.61,
-          "dette": 20575.75,
-          "equipement": 2970255.31,
-          "frais_personnel": 2311401.26,
-          "impots_locaux": 3592679.0,
-          "dgf": 1469397.0,
-          "annuite_dette": 2137.58,
-          "depenses_invest": 3155169.93,
-          "pop_dgf": 5715.0
+          "recettes_fonct": 7095584,
+          "depenses_fonct": 6293488,
+          "epargne_brute": 802097,
+          "dette": 20576,
+          "equipement": 2970255,
+          "frais_personnel": 2311401,
+          "impots_locaux": 3592679,
+          "dgf": 1469397,
+          "annuite_dette": 2138,
+          "depenses_invest": 3155170,
+          "pop_dgf": 5715
         },
         {
           "year": 2023,
-          "recettes_fonct": 7255926.64,
-          "depenses_fonct": 6299364.98,
-          "epargne_brute": 956561.66,
-          "dette": 21550.75,
-          "equipement": 2784123.92,
-          "frais_personnel": 2601862.24,
-          "impots_locaux": 3663188.0,
-          "dgf": 1512385.0,
-          "annuite_dette": 2733.91,
-          "depenses_invest": 3983304.04,
-          "pop_dgf": 5715.0
+          "recettes_fonct": 7255927,
+          "depenses_fonct": 6299365,
+          "epargne_brute": 956562,
+          "dette": 21551,
+          "equipement": 2784124,
+          "frais_personnel": 2601862,
+          "impots_locaux": 3663188,
+          "dgf": 1512385,
+          "annuite_dette": 2734,
+          "depenses_invest": 3983304,
+          "pop_dgf": 5715
         },
         {
           "year": 2024,
-          "recettes_fonct": 7557222.21,
-          "depenses_fonct": 6343218.78,
-          "epargne_brute": 1214003.43,
-          "dette": 19911.39,
-          "equipement": 2017846.25,
-          "frais_personnel": 2713221.24,
-          "impots_locaux": 3727745.0,
-          "dgf": 1198771.0,
-          "annuite_dette": 3761.25,
-          "depenses_invest": 2963449.97,
-          "pop_dgf": 5715.0
+          "recettes_fonct": 7557222,
+          "depenses_fonct": 6343219,
+          "epargne_brute": 1214003,
+          "dette": 19911,
+          "equipement": 2017846,
+          "frais_personnel": 2713221,
+          "impots_locaux": 3727745,
+          "dgf": 1198771,
+          "annuite_dette": 3761,
+          "depenses_invest": 2963450,
+          "pop_dgf": 5715
         }
       ]
-    }
-  },
-  "elections": {
-    "21425": {
-      "commune": "Montbard",
-      "presidentielle_t2": {
-        "2002": {
-          "Chirac (RPR)": 77.8,
-          "Le Pen (FN)": 22.2,
-          "abstention": 21.3
-        },
-        "2007": {
-          "Sarkozy (UMP)": 49.5,
-          "Royal (PS)": 50.5,
-          "abstention": 16.8
-        },
-        "2012": {
-          "Hollande (PS)": 56.4,
-          "Sarkozy (UMP)": 43.6,
-          "abstention": 20.4
-        },
-        "2017": {
-          "Macron (LREM)": 61.5,
-          "Le Pen (FN)": 38.5,
-          "abstention": 26.2
-        },
-        "2022": {
-          "Macron (LREM)": 54.8,
-          "Le Pen (RN)": 45.2,
-          "abstention": 29.7
-        }
-      }
-    },
-    "21663": {
-      "commune": "Venarey-les-Laumes",
-      "presidentielle_t2": {
-        "2002": {
-          "Chirac (RPR)": 79.1,
-          "Le Pen (FN)": 20.9,
-          "abstention": 19.8
-        },
-        "2007": {
-          "Sarkozy (UMP)": 47.2,
-          "Royal (PS)": 52.8,
-          "abstention": 15.9
-        },
-        "2012": {
-          "Hollande (PS)": 58.1,
-          "Sarkozy (UMP)": 41.9,
-          "abstention": 19.1
-        },
-        "2017": {
-          "Macron (LREM)": 63.2,
-          "Le Pen (FN)": 36.8,
-          "abstention": 24.5
-        },
-        "2022": {
-          "Macron (LREM)": 57.4,
-          "Le Pen (RN)": 42.6,
-          "abstention": 27.8
-        }
-      }
-    },
-    "21603": {
-      "commune": "Semur-en-Auxois",
-      "presidentielle_t2": {
-        "2002": {
-          "Chirac (RPR)": 83.5,
-          "Le Pen (FN)": 16.5,
-          "abstention": 18.9
-        },
-        "2007": {
-          "Sarkozy (UMP)": 55.1,
-          "Royal (PS)": 44.9,
-          "abstention": 14.2
-        },
-        "2012": {
-          "Hollande (PS)": 51.2,
-          "Sarkozy (UMP)": 48.8,
-          "abstention": 18.5
-        },
-        "2017": {
-          "Macron (LREM)": 68.9,
-          "Le Pen (FN)": 31.1,
-          "abstention": 22.1
-        },
-        "2022": {
-          "Macron (LREM)": 62.1,
-          "Le Pen (RN)": 37.9,
-          "abstention": 25.3
-        }
-      }
-    },
-    "21154": {
-      "commune": "Châtillon-sur-Seine",
-      "presidentielle_t2": {
-        "2002": {
-          "Chirac (RPR)": 81.2,
-          "Le Pen (FN)": 18.8,
-          "abstention": 20.1
-        },
-        "2007": {
-          "Sarkozy (UMP)": 52.3,
-          "Royal (PS)": 47.7,
-          "abstention": 15.4
-        },
-        "2012": {
-          "Hollande (PS)": 52.9,
-          "Sarkozy (UMP)": 47.1,
-          "abstention": 19.7
-        },
-        "2017": {
-          "Macron (LREM)": 60.2,
-          "Le Pen (FN)": 39.8,
-          "abstention": 25.8
-        },
-        "2022": {
-          "Macron (LREM)": 53.6,
-          "Le Pen (RN)": 46.4,
-          "abstention": 28.9
-        }
-      }
     }
   }
 }
