@@ -3,380 +3,937 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Observatoire Montbard — Dashboard territorial</title>
+  <title>Montbard, lecture d'un territoire en mutation</title>
+  <link rel="icon" href="data:,">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;1,300;1,400&family=JetBrains+Mono:wght@400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       --bg: #0a0e1a; --panel: #11172a; --border: #1e2642;
       --text: #e5e7eb; --dim: #6b7280; --accent: #fbbf24;
-      --red: #f87171; --green: #34d399;
-      --font-display: 'Fraunces', Georgia, serif;
-      --font-mono: 'JetBrains Mono', monospace;
-      --font-sans: 'Inter', sans-serif;
+      --tgv: #34d399; --red: #f87171; --green: #34d399;
+      --font-d: 'Fraunces', Georgia, serif;
+      --font-m: 'JetBrains Mono', monospace;
+      --font-s: 'Inter', sans-serif;
     }
-    body { background: var(--bg); color: var(--text); font-family: var(--font-sans); }
-    #loading {
-      position: fixed; inset: 0; z-index: 999;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center; gap: 20px;
-      background: var(--bg); font-family: var(--font-mono);
-      color: var(--accent); font-size: 13px; letter-spacing: 0.1em;
-    }
-    .spinner { width: 48px; height: 48px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .hero { padding: 52px 48px 40px; border-bottom: 1px solid var(--border); background: linear-gradient(180deg, var(--bg) 0%, #0d1220 100%); }
-    .hero-eyebrow { font-family: var(--font-mono); font-size: 10px; color: var(--accent); letter-spacing: 0.2em; margin-bottom: 20px; }
-    .hero-title { font-family: var(--font-display); font-size: clamp(40px, 6vw, 68px); font-weight: 300; line-height: 0.95; letter-spacing: -0.03em; margin-bottom: 20px; }
-    .hero-title em { font-style: italic; color: var(--accent); }
-    .hero-title .dim { color: var(--dim); }
-    .hero-sub { font-size: 15px; color: var(--dim); max-width: 680px; line-height: 1.6; font-weight: 300; margin-bottom: 36px; }
-    .kpi-row { display: flex; gap: 48px; flex-wrap: wrap; }
-    .kpi { display: flex; flex-direction: column; gap: 4px; }
-    .kpi-label { font-family: var(--font-mono); font-size: 9px; color: var(--dim); text-transform: uppercase; letter-spacing: 0.12em; }
-    .kpi-value { font-family: var(--font-display); font-size: 36px; font-weight: 400; line-height: 1; letter-spacing: -0.02em; }
-    .kpi-value .unit { font-size: 16px; color: var(--dim); margin-left: 3px; }
-    .kpi-delta { font-family: var(--font-mono); font-size: 11px; }
-    .delta-neg { color: var(--red); } .delta-pos { color: var(--green); }
-    .legend-bar { padding: 12px 48px; border-bottom: 1px solid var(--border); display: flex; gap: 24px; align-items: center; font-family: var(--font-mono); font-size: 10px; flex-wrap: wrap; }
-    .legend-item { display: flex; align-items: center; gap: 6px; }
-    .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); border-top: 1px solid var(--border); }
-    .grid-full { grid-column: span 3; }
-    .grid-half { grid-column: span 2; }
-    .panel { background: var(--panel); display: flex; flex-direction: column; }
-    .panel-header { padding: 14px 20px 10px; border-bottom: 1px solid var(--border); }
-    .panel-title { font-family: var(--font-mono); font-size: 10px; color: var(--accent); letter-spacing: 0.15em; text-transform: uppercase; }
-    .panel-sub { font-size: 11px; color: var(--dim); margin-top: 2px; }
-    .panel-body { padding: 16px 20px; flex: 1; display: flex; flex-direction: column; }
-    .chart-wrap { position: relative; flex: 1; min-height: 230px; }
-    .section-header { grid-column: span 3; padding: 20px 20px 12px; background: var(--bg); border-bottom: 2px solid var(--accent); font-family: var(--font-mono); font-size: 11px; color: var(--accent); letter-spacing: 0.25em; }
-    .synth-grid { display: grid; grid-template-columns: repeat(5, 1fr); }
-    .synth-item { padding: 20px; border-right: 1px solid var(--border); }
-    .synth-item:last-child { border-right: none; }
-    .synth-label { font-family: var(--font-mono); font-size: 9px; color: var(--dim); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; }
-    .synth-value { font-family: var(--font-display); font-size: 40px; font-weight: 400; line-height: 1; letter-spacing: -0.02em; }
-    .synth-note { font-size: 11px; color: var(--dim); margin-top: 4px; font-style: italic; }
-    .reading-note { margin-top: 12px; padding: 10px 14px; background: var(--bg); border: 1px solid var(--border); font-size: 11px; color: var(--dim); line-height: 1.6; }
-    .reading-note strong { font-family: var(--font-mono); font-size: 9px; color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase; }
-    .footer { padding: 32px 48px; border-top: 1px solid var(--border); font-size: 11px; color: var(--dim); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 24px; }
-    .footer-label { font-family: var(--font-mono); font-size: 9px; color: var(--accent); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 6px; }
-    @media (max-width: 900px) {
-      .grid { grid-template-columns: 1fr; }
-      .grid-full, .grid-half, .section-header { grid-column: span 1; }
-      .synth-grid { grid-template-columns: repeat(2, 1fr); }
-      .hero, .legend-bar { padding: 32px 24px; }
+    body { background: var(--bg); color: var(--text); font-family: var(--font-s); }
+    #loading { position:fixed; inset:0; z-index:999; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:20px; background:var(--bg); font-family:var(--font-m); color:var(--accent); font-size:13px; letter-spacing:.1em; }
+    .spinner { width:48px; height:48px; border:3px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin .8s linear infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+
+    .hero { padding:52px 48px 40px; border-bottom:1px solid var(--border); background:linear-gradient(180deg,var(--bg) 0%,#0d1220 100%); }
+    .hero-eye { font-family:var(--font-m); font-size:10px; color:var(--accent); letter-spacing:.2em; margin-bottom:20px; }
+    .hero-title { font-family:var(--font-d); font-size:clamp(40px,6vw,68px); font-weight:300; line-height:1; letter-spacing:-.03em; margin-bottom:20px; }
+    .hero-title em { font-style:italic; color:var(--accent); }
+    .hero-title .dim { color:var(--dim); }
+    .hero-sub { font-size:15px; color:var(--dim); max-width:760px; line-height:1.6; font-weight:300; margin-bottom:36px; }
+    .kpi-row { display:flex; gap:48px; flex-wrap:wrap; }
+    .kpi { display:flex; flex-direction:column; gap:4px; }
+    .kpi-label { font-family:var(--font-m); font-size:9px; color:var(--dim); text-transform:uppercase; letter-spacing:.12em; }
+    .kpi-value { font-family:var(--font-d); font-size:36px; font-weight:400; line-height:1; letter-spacing:-.02em; }
+    .kpi-value .unit { font-size:16px; color:var(--dim); margin-left:3px; }
+    .kpi-delta { font-family:var(--font-m); font-size:11px; }
+    .delta-neg { color:var(--red); } .delta-pos { color:var(--green); }
+
+    .legend-bar { padding:12px 48px; border-bottom:1px solid var(--border); display:flex; gap:20px; align-items:center; font-family:var(--font-m); font-size:10px; flex-wrap:wrap; }
+    .leg { display:flex; align-items:center; gap:6px; }
+    .leg-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+    .leg-line { width:14px; height:0; border-top:1.5px dashed; flex-shrink:0; }
+    .leg-sep { color:var(--border); }
+
+    .grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--border); border-top:1px solid var(--border); }
+    .g3 { grid-column:span 3; }
+    .g2 { grid-column:span 2; }
+    .panel { background:var(--panel); display:flex; flex-direction:column; }
+    .ph { padding:14px 20px 10px; border-bottom:1px solid var(--border); }
+    .pt { font-family:var(--font-m); font-size:10px; color:var(--accent); letter-spacing:.15em; text-transform:uppercase; }
+    .ps { font-size:11px; color:var(--dim); margin-top:2px; }
+    .pb { padding:16px 20px; flex:1; display:flex; flex-direction:column; }
+    .cw { position:relative; flex:1; min-height:230px; }
+    .sh { grid-column:span 3; padding:20px 20px 12px; background:var(--bg); border-bottom:2px solid var(--accent); font-family:var(--font-m); font-size:11px; color:var(--accent); letter-spacing:.25em; }
+
+    .synth { display:grid; grid-template-columns:repeat(4,1fr); }
+    .si { padding:20px; border-right:1px solid var(--border); }
+    .si:last-child { border-right:none; }
+    .sl { font-family:var(--font-m); font-size:9px; color:var(--dim); text-transform:uppercase; letter-spacing:.1em; margin-bottom:8px; }
+    .sv { font-family:var(--font-d); font-size:40px; font-weight:400; line-height:1; letter-spacing:-.02em; }
+    .sn { font-size:11px; color:var(--dim); margin-top:4px; font-style:italic; }
+
+    .note { margin-top:12px; padding:10px 14px; background:var(--bg); border:1px solid var(--border); font-size:11px; color:var(--dim); line-height:1.6; }
+    .note strong { font-family:var(--font-m); font-size:9px; color:var(--accent); letter-spacing:.1em; text-transform:uppercase; }
+    .src { font-family:var(--font-m); font-size:8px; color:var(--dim); opacity:.6; margin-top:6px; }
+
+    .footer { padding:32px 48px; border-top:1px solid var(--border); font-size:11px; color:var(--dim); display:flex; justify-content:space-between; flex-wrap:wrap; gap:24px; }
+    .fl { font-family:var(--font-m); font-size:9px; color:var(--accent); letter-spacing:.15em; text-transform:uppercase; margin-bottom:6px; }
+
+    @media(max-width:900px){
+      .grid{grid-template-columns:1fr;}
+      .g3,.g2,.sh{grid-column:span 1;}
+      .synth{grid-template-columns:repeat(2,1fr);}
+      .hero,.legend-bar,.footer{padding:32px 24px;}
     }
   </style>
 </head>
 <body>
-
 <div id="loading"><div class="spinner"></div><span>Chargement des données…</span></div>
 <div id="app" style="display:none">
 
   <div class="hero">
-    <div class="hero-eyebrow">OBSERVATOIRE TERRITORIAL · CÔTE-D'OR (21) · N°01</div>
-    <h1 class="hero-title"><em>Montbard</em><span class="dim">,</span><br>quatre décennies <em>en chiffres</em></h1>
-    <p class="hero-sub">Lecture comparée de l'évolution démographique, économique, sociale et politique de la sous-préfecture bourguignonne avec Venarey-les-Laumes, Semur-en-Auxois et Châtillon-sur-Seine.</p>
+    <div class="hero-eye">OBSERVATOIRE TERRITORIAL · CÔTE-D'OR (21)</div>
+    <h1 class="hero-title"><em>Montbard</em><span class="dim">,</span><br>lecture d'un territoire <em>en mutation</em></h1>
+    <p class="hero-sub">Évolution démographique, sociale et financière de la sous-préfecture bourguignonne, comparée à Venarey-les-Laumes, Semur-en-Auxois et Châtillon-sur-Seine. Sources : INSEE Melodi · DGFiP · OFGL.</p>
     <div class="kpi-row" id="kpi-row"></div>
   </div>
 
   <div class="legend-bar">
-    <span style="font-family:var(--font-mono);font-size:9px;color:var(--dim);letter-spacing:.1em">COMMUNES :</span>
-    <div class="legend-item"><div class="legend-dot" style="background:#fbbf24"></div><span style="color:#e5e7eb">Montbard</span></div>
-    <div class="legend-item"><div class="legend-dot" style="background:#60a5fa"></div><span>Venarey-les-Laumes</span></div>
-    <div class="legend-item"><div class="legend-dot" style="background:#34d399"></div><span>Semur-en-Auxois</span></div>
-    <div class="legend-item"><div class="legend-dot" style="background:#f472b6"></div><span>Châtillon-sur-Seine</span></div>
+    <span style="font-family:var(--font-m);font-size:9px;color:var(--dim);letter-spacing:.1em">COMMUNES :</span>
+    <div class="leg"><div class="leg-dot" style="background:#fbbf24"></div><span style="color:#e5e7eb">Montbard</span></div>
+    <div class="leg"><div class="leg-dot" style="background:#60a5fa"></div><span>Venarey-les-Laumes</span></div>
+    <div class="leg"><div class="leg-dot" style="background:#34d399"></div><span>Semur-en-Auxois</span></div>
+    <div class="leg"><div class="leg-dot" style="background:#f472b6"></div><span>Châtillon-sur-Seine</span></div>
+    <span class="leg-sep">·</span>
+    <span style="font-family:var(--font-m);font-size:9px;color:var(--dim);letter-spacing:.1em">REPÈRES :</span>
+    <div class="leg"><div class="leg-line" style="border-color:#34d399"></div><span style="color:var(--tgv)">TGV 1981</span></div>
+    <div class="leg"><div class="leg-line" style="border-color:#fbbf24"></div><span style="color:var(--accent)">M.P. 1995 · C.S. 2008 · L.P. 2014</span></div>
   </div>
 
   <div class="grid">
-    <div class="section-header">§ SYNTHÈSE</div>
-    <div class="panel grid-full">
-      <div class="panel-header"><div class="panel-title">Montbard en 5 chiffres</div><div class="panel-sub">Indicateurs clés 1975–2024</div></div>
-      <div class="synth-grid" id="synth-grid"></div>
+
+    <!-- SYNTHÈSE -->
+    <div class="sh">§ SYNTHÈSE</div>
+    <div class="panel g3">
+      <div class="ph"><div class="pt">Montbard en 4 chiffres</div><div class="ps">Indicateurs clés · données INSEE + DGFiP + OFGL</div></div>
+      <div class="synth" id="synth"></div>
     </div>
 
-    <div class="section-header">§ DÉMOGRAPHIE</div>
-    <div class="panel grid-half">
-      <div class="panel-header"><div class="panel-title">Évolution de la population</div><div class="panel-sub">Habitants · recensements INSEE 1975–2022</div></div>
-      <div class="panel-body"><div class="chart-wrap"><canvas id="chart-pop-abs"></canvas></div></div>
-    </div>
-    <div class="panel">
-      <div class="panel-header"><div class="panel-title">Base 100 = 1975</div><div class="panel-sub">Déclin relatif comparé</div></div>
-      <div class="panel-body"><div class="chart-wrap"><canvas id="chart-pop-idx"></canvas></div></div>
-    </div>
-    <div class="panel">
-      <div class="panel-header"><div class="panel-title">Structure par âge</div><div class="panel-sub">Montbard · pyramide 2022</div></div>
-      <div class="panel-body"><div class="chart-wrap"><canvas id="chart-pyramide"></canvas></div></div>
-    </div>
-    <div class="panel grid-half">
-      <div class="panel-header"><div class="panel-title">Natalité & mortalité</div><div class="panel-sub">‰ · Montbard 2011–2022</div></div>
-      <div class="panel-body">
-        <div class="chart-wrap"><canvas id="chart-natalite"></canvas></div>
-        <div class="reading-note"><strong>Lecture · </strong>Le solde naturel est négatif à Montbard depuis 2016. L'âge médian dépasse 46 ans.</div>
+    <!-- DÉMOGRAPHIE -->
+    <div class="sh">§ DÉMOGRAPHIE</div>
+
+    <div class="panel g2">
+      <div class="ph"><div class="pt">Évolution de la population</div><div class="ps">Habitants · INSEE Melodi PMUN 2006–2023</div></div>
+      <div class="pb"><div class="cw"><canvas id="c-pop-abs"></canvas></div>
+        <div class="note"><strong>Lecture · </strong>Le rythme du déclin s'accélère après 2016 : −958 habitants en 7 ans (2016–2023), contre −263 sur les 10 années précédentes.</div>
+        <div class="src">Source : INSEE Melodi DS_POPULATIONS_HISTORIQUES (population municipale)</div>
       </div>
     </div>
 
-    <div class="section-header">§ REVENUS & CONDITIONS DE VIE</div>
-    <div class="panel grid-half">
-      <div class="panel-header"><div class="panel-title">Revenu médian disponible</div><div class="panel-sub">€/an · source FiLoSoFi INSEE 2012–2022</div></div>
-      <div class="panel-body"><div class="chart-wrap"><canvas id="chart-revenus"></canvas></div></div>
-    </div>
     <div class="panel">
-      <div class="panel-header"><div class="panel-title">Taux de pauvreté</div><div class="panel-sub">% · seuil à 60% du revenu médian</div></div>
-      <div class="panel-body"><div class="chart-wrap"><canvas id="chart-pauvrete"></canvas></div></div>
-    </div>
-
-    <div class="section-header">§ ÉCONOMIE & EMPLOI</div>
-    <div class="panel grid-half">
-      <div class="panel-header"><div class="panel-title">Emploi salarié & chômage</div><div class="panel-sub">Postes salariés + taux de chômage zone d'emploi</div></div>
-      <div class="panel-body"><div class="chart-wrap"><canvas id="chart-emploi"></canvas></div></div>
-    </div>
-    <div class="panel">
-      <div class="panel-header"><div class="panel-title">Créations d'entreprises</div><div class="panel-sub">Nouvelles immatriculations annuelles</div></div>
-      <div class="panel-body"><div class="chart-wrap"><canvas id="chart-creations"></canvas></div></div>
-    </div>
-    <div class="panel grid-full">
-      <div class="panel-header"><div class="panel-title">Structure sectorielle</div><div class="panel-sub">Entreprises actives par secteur · Montbard 2015–2023</div></div>
-      <div class="panel-body"><div class="chart-wrap" style="min-height:200px"><canvas id="chart-secteurs"></canvas></div></div>
-    </div>
-
-    <div class="section-header">§ LOGEMENT</div>
-    <div class="panel grid-half">
-      <div class="panel-header"><div class="panel-title">Composition du parc de logements</div><div class="panel-sub">Montbard · 1999–2022</div></div>
-      <div class="panel-body"><div class="chart-wrap"><canvas id="chart-logement"></canvas></div></div>
-    </div>
-    <div class="panel">
-      <div class="panel-header"><div class="panel-title">Taux de vacance 1999 vs 2022</div><div class="panel-sub">% logements vacants · comparaison 4 communes</div></div>
-      <div class="panel-body">
-        <div class="chart-wrap"><canvas id="chart-vacance"></canvas></div>
-        <div class="reading-note"><strong>Lecture · </strong>La vacance a explosé à Montbard : de 10% en 1999 à près de 24% en 2022, signal d'une dévitalisation du bâti résidentiel.</div>
+      <div class="ph"><div class="pt">Base 100 = 2006</div><div class="ps">Déclin relatif comparé</div></div>
+      <div class="pb"><div class="cw"><canvas id="c-pop-idx"></canvas></div>
+        <div class="src">Source : INSEE Melodi · indexation calculée</div>
       </div>
     </div>
 
-    <div class="section-header">§ FINANCES LOCALES</div>
-
-    <div class="panel grid-full">
-      <div class="panel-header"><div class="panel-title">Budget de fonctionnement</div><div class="panel-sub">€ · Recettes, dépenses et épargne brute · Montbard 2017–2024 · source OFGL</div></div>
-      <div class="panel-body"><div class="chart-wrap" style="min-height:240px"><canvas id="chart-budget"></canvas></div></div>
-    </div>
-
-    <div class="panel">
-      <div class="panel-header"><div class="panel-title">Encours de dette</div><div class="panel-sub">€ total · Montbard 2017–2024</div></div>
-      <div class="panel-body"><div class="chart-wrap"><canvas id="chart-dette-abs"></canvas></div></div>
-    </div>
-    <div class="panel">
-      <div class="panel-header"><div class="panel-title">Dette par habitant</div><div class="panel-sub">€/hab · comparaison 4 communes</div></div>
-      <div class="panel-body"><div class="chart-wrap"><canvas id="chart-dette-hab"></canvas></div></div>
-    </div>
-    <div class="panel">
-      <div class="panel-header"><div class="panel-title">Annuité de la dette</div><div class="panel-sub">€ · remboursement annuel capital+intérêts</div></div>
-      <div class="panel-body"><div class="chart-wrap"><canvas id="chart-annuite"></canvas></div></div>
-    </div>
-
-    <div class="panel grid-half">
-      <div class="panel-header"><div class="panel-title">Dépenses d'investissement</div><div class="panel-sub">€ · comparaison 4 communes 2017–2024</div></div>
-      <div class="panel-body"><div class="chart-wrap"><canvas id="chart-invest"></canvas></div></div>
-    </div>
-    <div class="panel">
-      <div class="panel-header"><div class="panel-title">Dépenses d'équipement / habitant</div><div class="panel-sub">€/hab · effort d'investissement comparé</div></div>
-      <div class="panel-body"><div class="chart-wrap"><canvas id="chart-equipement-hab"></canvas></div></div>
-    </div>
-
-    <div class="panel">
-      <div class="panel-header"><div class="panel-title">Impôts locaux</div><div class="panel-sub">€ · Montbard 2017–2024</div></div>
-      <div class="panel-body"><div class="chart-wrap"><canvas id="chart-impots"></canvas></div></div>
-    </div>
-    <div class="panel">
-      <div class="panel-header"><div class="panel-title">Impôts locaux / habitant</div><div class="panel-sub">€/hab · pression fiscale comparée</div></div>
-      <div class="panel-body"><div class="chart-wrap"><canvas id="chart-impots-hab"></canvas></div></div>
-    </div>
-    <div class="panel">
-      <div class="panel-header"><div class="panel-title">Frais de personnel</div><div class="panel-sub">% des dépenses de fonctionnement · comparaison</div></div>
-      <div class="panel-body">
-        <div class="chart-wrap"><canvas id="chart-personnel"></canvas></div>
-        <div class="reading-note"><strong>Lecture · </strong>Le ratio frais de personnel / dépenses de fonctionnement mesure le poids des charges de structure. Un ratio élevé laisse peu de marges de manœuvre budgétaire.</div>
+    <div class="panel g2">
+      <div class="ph"><div class="pt">Pyramide des âges 2022</div><div class="ps">Hommes / Femmes · Montbard</div></div>
+      <div class="pb"><div class="cw"><canvas id="c-pyramide"></canvas></div>
+        <div class="src">Source : INSEE Melodi DS_RP_POPULATION_PRINC</div>
       </div>
     </div>
 
-    <div class="panel grid-full">
-      <div class="panel-header"><div class="panel-title">Épargne brute par habitant</div><div class="panel-sub">€/hab · capacité d'autofinancement comparée · 2017–2024</div></div>
-      <div class="panel-body"><div class="chart-wrap" style="min-height:220px"><canvas id="chart-epargne-hab"></canvas></div></div>
+    <div class="panel">
+      <div class="ph"><div class="pt">Part des 65 ans et +</div><div class="ps">% population · 2011 → 2022 · 4 communes</div></div>
+      <div class="pb"><div class="cw"><canvas id="c-seniors"></canvas></div>
+        <div class="note"><strong>Lecture · </strong>Le vieillissement touche les 4 sous-préfectures, mais s'accélère le plus vite à Montbard.</div>
+        <div class="src">Source : INSEE Melodi · Y_GE65/_T</div>
+      </div>
     </div>
 
+    <!-- LOGEMENT -->
+    <div class="sh">§ LOGEMENT</div>
+
+    <div class="panel g2">
+      <div class="ph"><div class="pt">Composition du parc de logements</div><div class="ps">Montbard 2011 / 2016 / 2022 · résidences principales, vacants, secondaires</div></div>
+      <div class="pb"><div class="cw"><canvas id="c-logement"></canvas></div>
+        <div class="src">Source : INSEE Melodi DS_RP_LOGEMENT_PRINC (filtre OCS, autres dimensions = total)</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="ph"><div class="pt">Taux de vacance 2022</div><div class="ps">% logements vacants · 4 communes</div></div>
+      <div class="pb"><div class="cw"><canvas id="c-vacance"></canvas></div>
+        <div class="note"><strong>Lecture · </strong>La vacance résidentielle est un signal de dévitalisation : un parc qui se vide plus vite que la population.</div>
+        <div class="src">Source : INSEE Melodi · OCS=DW_VAC / Total</div>
+      </div>
+    </div>
+
+    <!-- ACTIVITÉ -->
+    <div class="sh">§ ACTIVITÉ & EMPLOI</div>
+
+    <div class="panel g2">
+      <div class="ph"><div class="pt">Actifs occupés</div><div class="ps">Nombre · 2011 → 2022 · 4 communes</div></div>
+      <div class="pb"><div class="cw"><canvas id="c-activite"></canvas></div>
+        <div class="note"><strong>Lecture · </strong>Montbard a perdu 25% de ses actifs occupés en 11 ans (2096 → 1576), une érosion plus marquée que ses voisines.</div>
+        <div class="src">Source : INSEE Melodi DS_RP_ACTIVITE_PRINC · EMPSTA_ENQ=1 (actifs occupés)</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="ph"><div class="pt">Taux d'emploi · Montbard</div><div class="ps">% de la population active occupée / population totale</div></div>
+      <div class="pb"><div class="cw"><canvas id="c-chomage"></canvas></div>
+        <div class="src">Source : INSEE Melodi · actifs occupés / population totale</div>
+      </div>
+    </div>
+
+    <!-- REVENUS -->
+    <div class="sh">§ REVENUS & CONDITIONS DE VIE</div>
+
+    <div class="panel">
+      <div class="ph"><div class="pt">Revenu médian disponible</div><div class="ps">€/an · 2021 · 4 communes · source FiLoSoFi</div></div>
+      <div class="pb"><div class="cw"><canvas id="c-rev-median"></canvas></div>
+        <div class="src">Source : INSEE Melodi DS_FILOSOFI_CC · MED_SL</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="ph"><div class="pt">Taux de pauvreté</div><div class="ps">% · 2021 · seuil à 60% du revenu médian national</div></div>
+      <div class="pb"><div class="cw"><canvas id="c-pauvrete"></canvas></div>
+        <div class="src">Source : INSEE Melodi DS_FILOSOFI_MEN_TP_NIVVIE · PR_MD60</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="ph"><div class="pt">Revenu médian par âge fiscal</div><div class="ps">€/an · 2021 · Montbard</div></div>
+      <div class="pb"><div class="cw"><canvas id="c-rev-age"></canvas></div>
+        <div class="note"><strong>Lecture · </strong>Le revenu médian augmente avec l'âge — l'écart entre les jeunes (&lt;30 ans) et les plus âgés est révélateur des trajectoires de vie locales.</div>
+        <div class="src">Source : INSEE Melodi · MED_SL × TPH_FISCAL</div>
+      </div>
+    </div>
+
+    <!-- FINANCES -->
+    <div class="sh">§ FINANCES LOCALES</div>
+
+    <div class="panel g3">
+      <div class="ph">
+        <div class="pt">Budget de fonctionnement</div>
+        <div class="ps">€ · Recettes, dépenses et épargne brute · Montbard 2000–2024</div>
+      </div>
+      <div class="pb"><div class="cw" style="min-height:260px"><canvas id="c-budget"></canvas></div>
+        <div class="note"><strong>Note · </strong>2000–2016 : DGFiP (montants en k€ convertis). 2017–2024 : OFGL (budget principal). Légère discontinuité possible au raccord liée aux différences de périmètre.</div>
+        <div class="src">Sources : DGFiP data.gouv.fr · OFGL data.ofgl.fr</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="ph"><div class="pt">Encours de dette · Montbard</div><div class="ps">€ total · 2000–2024</div></div>
+      <div class="pb"><div class="cw"><canvas id="c-dette-abs"></canvas></div>
+        <div class="src">Sources : DGFiP · OFGL</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="ph"><div class="pt">Dette par habitant</div><div class="ps">€/hab · comparaison 4 communes</div></div>
+      <div class="pb"><div class="cw"><canvas id="c-dette-hab"></canvas></div>
+        <div class="src">Sources : DGFiP · OFGL · INSEE</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="ph"><div class="pt">Annuité de la dette</div><div class="ps">€ · remboursement annuel capital+intérêts · Montbard 2010–2024</div></div>
+      <div class="pb"><div class="cw"><canvas id="c-annuite"></canvas></div>
+        <div class="src">Sources : DGFiP · OFGL</div>
+      </div>
+    </div>
+
+    <div class="panel g2">
+      <div class="ph"><div class="pt">Dépenses d'investissement</div><div class="ps">€ · comparaison 4 communes · 2000–2024</div></div>
+      <div class="pb"><div class="cw"><canvas id="c-invest"></canvas></div>
+        <div class="src">Sources : DGFiP · OFGL</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="ph"><div class="pt">Dépenses d'équipement / habitant</div><div class="ps">€/hab · effort d'investissement comparé</div></div>
+      <div class="pb"><div class="cw"><canvas id="c-equip-hab"></canvas></div>
+        <div class="src">Sources : DGFiP · OFGL · INSEE</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="ph"><div class="pt">Impôts locaux</div><div class="ps">€ · Montbard 2000–2024</div></div>
+      <div class="pb"><div class="cw"><canvas id="c-impots"></canvas></div>
+        <div class="src">Sources : DGFiP · OFGL</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="ph"><div class="pt">Impôts locaux / habitant</div><div class="ps">€/hab · pression fiscale comparée</div></div>
+      <div class="pb"><div class="cw"><canvas id="c-impots-hab"></canvas></div>
+        <div class="src">Sources : DGFiP · OFGL · INSEE</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="ph"><div class="pt">Frais de personnel</div><div class="ps">% des dépenses de fonctionnement · 4 communes</div></div>
+      <div class="pb"><div class="cw"><canvas id="c-personnel"></canvas></div>
+        <div class="src">Sources : DGFiP · OFGL</div>
+      </div>
+    </div>
+
+    <div class="panel g3">
+      <div class="ph"><div class="pt">Épargne brute par habitant</div><div class="ps">€/hab · capacité d'autofinancement comparée · 2000–2024</div></div>
+      <div class="pb"><div class="cw" style="min-height:220px"><canvas id="c-epargne-hab"></canvas></div>
+        <div class="src">Sources : DGFiP · OFGL · INSEE</div>
+      </div>
+    </div>
 
   </div>
 
   <div class="footer">
-    <div><div class="footer-label">Sources</div>INSEE (Recensements, FiLoSoFi, FLORES, SIRENE) · OFGL · Ministère de l'Intérieur · data.gouv.fr</div>
-    <div style="text-align:right"><div class="footer-label">Note</div>Données générées par <code style="background:var(--panel);padding:1px 6px;font-size:10px">collect_data.py</code> · <span id="collect-date"></span></div>
+    <div><div class="fl">Sources</div>
+      INSEE Melodi (population, recensement, FiLoSoFi)<br>
+      DGFiP data.gouv.fr (finances 2000–2016) · OFGL (finances 2017–2024)
+    </div>
+    <div style="text-align:right">
+      <div class="fl">Collecte</div>
+      <span id="collect-date"></span><br>
+      <code style="background:var(--panel);padding:1px 6px;font-size:10px">collect_data.py</code>
+    </div>
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
 <script>
-const COLORS = { "21425":"#fbbf24","21663":"#60a5fa","21603":"#34d399","21154":"#f472b6" };
-const BG="#0a0e1a",BORDER="#1e2642",DIM="#6b7280";
-Chart.defaults.color=DIM; Chart.defaults.borderColor=BORDER;
-Chart.defaults.font.family="'JetBrains Mono',monospace"; Chart.defaults.font.size=10;
-const GRID={color:BORDER,lineWidth:1};
-const TT={backgroundColor:BG,borderColor:"#fbbf24",borderWidth:1,padding:10,titleFont:{family:"'JetBrains Mono',monospace",size:10},bodyFont:{family:"'JetBrains Mono',monospace",size:10}};
-const LEG={labels:{font:{family:"'JetBrains Mono',monospace",size:9},boxWidth:10,boxHeight:10,color:DIM}};
-const fmt=(n,d=0)=>n==null?"—":n.toLocaleString("fr-FR",{maximumFractionDigits:d});
-const fmtPct=(n,d=1)=>n==null?"—":`${n.toFixed(d)}%`;
-function mc(id,cfg){const c=document.getElementById(id);if(!c)return;return new Chart(c,cfg);}
+// ════════════════════════════════════════════════════════════════════════════
+// CONFIG
+// ════════════════════════════════════════════════════════════════════════════
+const C = {"21425":"Montbard","21663":"Venarey-les-Laumes","21603":"Semur-en-Auxois","21154":"Châtillon-sur-Seine"};
+const COL = {"21425":"#fbbf24","21663":"#60a5fa","21603":"#34d399","21154":"#f472b6"};
+const M = "21425";
+const BG="#0a0e1a", BORDER="#1e2642", DIM="#6b7280";
+const COL_TGV = "#34d399", COL_MAIRE = "#fbbf24";
 
+Chart.defaults.color = DIM;
+Chart.defaults.borderColor = BORDER;
+Chart.defaults.font.family = "'JetBrains Mono',monospace";
+Chart.defaults.font.size = 10;
+
+const GRID = { color: BORDER, lineWidth: 1 };
+const TT = {
+  backgroundColor: BG, borderColor: "#fbbf24", borderWidth: 1, padding: 10,
+  titleFont: { family: "'JetBrains Mono',monospace", size: 10 },
+  bodyFont:  { family: "'JetBrains Mono',monospace", size: 10 },
+};
+const LEG = { labels: { font: { family:"'JetBrains Mono',monospace", size:9 }, boxWidth:10, boxHeight:10, color:DIM } };
+
+// ────────────────────────────────────────────────────────────────────────────
+// MARQUEURS HISTORIQUES
+// ────────────────────────────────────────────────────────────────────────────
+// Construit un objet `annotation` Chart.js conditionnel : seuls les marqueurs
+// dont l'année tombe dans la plage des données affichées sont rendus.
+function buildAnnotations(years, marqueurs) {
+  const yearsNum = years.map(Number);
+  const minY = Math.min(...yearsNum), maxY = Math.max(...yearsNum);
+  const ann = { annotations: {} };
+  Object.entries(marqueurs).forEach(([key, mk]) => {
+    if (mk.year < minY || mk.year > maxY) return;
+    const isTGV = mk.type === "infra";
+    ann.annotations[key] = {
+      type: "line",
+      scaleID: "x",
+      value: String(mk.year),
+      borderColor: isTGV ? COL_TGV+"66" : COL_MAIRE+"66",
+      borderWidth: 1.5,
+      borderDash: [5, 4],
+      label: {
+        display: true,
+        content: mk.label,
+        position: "start",
+        color: isTGV ? COL_TGV : COL_MAIRE,
+        backgroundColor: "transparent",
+        font: { family:"'JetBrains Mono',monospace", size: 9 },
+        yAdjust: -2,
+      },
+    };
+  });
+  return ann;
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// HELPERS DE FORMAT
+// ════════════════════════════════════════════════════════════════════════════
+const fmt   = (n,d=0) => n==null ? "—" : n.toLocaleString("fr-FR",{maximumFractionDigits:d});
+const fmtM  = v => v==null ? "—" : `${(v/1e6).toFixed(2)} M€`;
+const fmtPct= (n,d=1) => n==null ? "—" : `${n.toFixed(d)}%`;
+
+function mc(id, cfg) {
+  const c = document.getElementById(id);
+  if (!c) return;
+  return new Chart(c, cfg);
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// PARSING DES DIMENSIONS MELODI
+// ════════════════════════════════════════════════════════════════════════════
+// Les clés de millésimes sont des chaînes "DIM1=val1|DIM2=val2|..."
+// → fonction qui retourne la valeur correspondant à un filtre exact
+function getDim(millesimes, year, filter) {
+  const data = millesimes[String(year)];
+  if (!data) return null;
+  const filterStr = Object.entries(filter).map(([k,v])=>`${k}=${v}`).sort().join("|");
+  // Reconstruction de la clé attendue
+  for (const [key, val] of Object.entries(data)) {
+    const parts = key.split("|").sort().join("|");
+    if (parts === filterStr) return val;
+  }
+  return null;
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// BOOT
+// ════════════════════════════════════════════════════════════════════════════
 fetch("data.json")
-  .then(r=>{if(!r.ok)throw new Error(`HTTP ${r.status}`);return r.json();})
-  .then(D=>{
-    document.getElementById("loading").style.display="none";
-    document.getElementById("app").style.display="block";
+  .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
+  .then(D => {
+    document.getElementById("loading").style.display = "none";
+    document.getElementById("app").style.display = "block";
     build(D);
   })
-  .catch(err=>{
-    document.getElementById("loading").innerHTML=`<span style="color:#f87171;text-align:center">⚠️ Impossible de charger data.json<br><small>${err.message}</small><br><br><small style="color:#6b7280">Lancez : python3 -m http.server 8000</small></span>`;
+  .catch(err => {
+    document.getElementById("loading").innerHTML =
+      `<span style="color:#f87171;text-align:center">⚠️ Impossible de charger data.json<br>
+      <small>${err.message}</small><br><br>
+      <small style="color:#6b7280">En local : python3 -m http.server 8000</small></span>`;
   });
 
-function build(D){
-  const d=new Date(D.meta.collect_date);
-  document.getElementById("collect-date").textContent=`Collecte du ${d.toLocaleDateString("fr-FR")}`;
-  const C=Object.entries(D.meta.communes).map(([code,info])=>({code,nom:info.nom}));
+function build(D) {
+  const MK = D.meta.marqueurs;
+  const codes = Object.keys(C);
 
-  // KPIs
-  const pop=D.population["21425"].series;
-  const pF=pop[0],pL=pop[pop.length-1];
-  const pEvol=((pL.value-pF.value)/pF.value)*100;
-  const rev=D.revenus["21425"].series;
-  const rL=rev[rev.length-1];
-  const finLast=D.finances["21425"].series[D.finances["21425"].series.length-1];
-  const detteHab=finLast&&finLast.pop_dgf?Math.round(finLast.dette/finLast.pop_dgf):null;
-  document.getElementById("kpi-row").innerHTML=[
-    {label:"Population 2022",value:fmt(pL.value),unit:"hab.",delta:pEvol,color:"#fbbf24"},
-    {label:`Depuis ${pF.year}`,value:`${pEvol>0?"+":""}${fmt(pL.value-pF.value)}`,unit:"hab.",color:pEvol<0?"#f87171":"#34d399"},
-    {label:"Revenu médian",value:fmt(rL.median),unit:"€/an",color:"#fbbf24"},
-    {label:"Taux de pauvreté",value:fmtPct(rL.pauvrete),color:"#f472b6"},
-    {label:"Dette / habitant",value:fmt(detteHab),unit:"€",color:"#f87171"},
-  ].map(k=>`<div class="kpi"><div class="kpi-label">${k.label}</div><div class="kpi-value" style="color:${k.color}">${k.value}${k.unit?`<span class="unit">${k.unit}</span>`:""}</div>${k.delta!=null?`<div class="kpi-delta ${k.delta<0?"delta-neg":"delta-pos"}">${k.delta>0?"▲":"▼"} ${Math.abs(k.delta).toFixed(1)}%</div>`:""}</div>`).join("");
+  // Date collecte
+  document.getElementById("collect-date").textContent =
+    `Collecte du ${new Date(D.meta.collect_date).toLocaleDateString("fr-FR")}`;
 
-  // Synthèse
-  const fin=D.finances["21425"].series,fL=fin[fin.length-1];
-  const emp=D.emploi["21425"].series;
-  const eEvol=((emp[emp.length-1].emploi_salarie-emp[0].emploi_salarie)/emp[0].emploi_salarie)*100;
-  const eprHab=fL&&fL.pop_dgf?Math.round(fL.epargne_brute/fL.pop_dgf):null;
-  document.getElementById("synth-grid").innerHTML=[
-    {label:"Population",value:`${pEvol.toFixed(1)}%`,note:`depuis ${pF.year}`,color:"#f87171"},
-    {label:"Revenu médian",value:`+${(((rL.median-rev[0].median)/rev[0].median)*100).toFixed(1)}%`,note:`depuis ${rev[0].year}`,color:"#34d399"},
-    {label:"Emploi salarié",value:`${eEvol>0?"+":""}${eEvol.toFixed(1)}%`,note:`depuis ${emp[0].year}`,color:eEvol<0?"#f87171":"#34d399"},
-    {label:"Dette / hab.",value:fmt(fL&&fL.pop_dgf?Math.round(fL.dette/fL.pop_dgf):null),note:"€ en "+fL.year,color:"#f87171"},
-    {label:"Épargne brute/hab.",value:fmt(eprHab),note:"€ en "+fL.year,color:"#34d399"},
-  ].map(s=>`<div class="synth-item"><div class="synth-label">${s.label}</div><div class="synth-value" style="color:${s.color}">${s.value}</div><div class="synth-note">${s.note}</div></div>`).join("");
+  // ──────────────────────────────────────────────────────────────────────────
+  // KPIs HERO
+  // ──────────────────────────────────────────────────────────────────────────
+  const pM = D.population[M].series;
+  const pF = pM[0], pL = pM[pM.length-1];
+  const popEvol = (pL.value - pF.value) / pF.value * 100;
 
-  // Years
-  const popYrs=[...new Set(Object.values(D.population).flatMap(c=>c.series.map(s=>s.year)))].sort();
-  const revYrs=D.revenus["21425"].series.map(s=>s.year);
-  const empYrs=D.emploi["21425"].series.map(s=>s.year);
-  const entYrs=D.entreprises["21425"].series.map(s=>s.year);
-  const logYrs=D.logement["21425"].series.map(s=>s.year);
-  const finYrs=D.finances["21425"].series.map(s=>s.year);
-  const base75={};
-  C.forEach(({code})=>{const f=D.population[code].series.find(s=>s.year===1975);base75[code]=f?f.value:null;});
+  const fM = D.finances[M].series;
+  const fL = fM[fM.length-1];
+  const detteHab = fL.dette && fL.pop_dgf ? Math.round(fL.dette/fL.pop_dgf) : null;
+  const eprHab = fL.epargne_brute && fL.pop_dgf ? Math.round(fL.epargne_brute/fL.pop_dgf) : null;
+
+  // Revenu médian 2021
+  const revMed = getDim(D.revenus[M].millesimes, 2021,
+    {FILOSOFI_MEASURE:"MED_SL", UNIT_MEASURE:"EUR_YR"});
+
+  document.getElementById("kpi-row").innerHTML = [
+    {label:`Population ${pL.year}`, value:fmt(pL.value), unit:"hab.", delta:popEvol, color:"#fbbf24"},
+    {label:`Variation depuis ${pF.year}`, value:`${popEvol>0?"+":""}${fmt(pL.value-pF.value)}`,
+     unit:"hab.", color:popEvol<0?"#f87171":"#34d399"},
+    {label:`Revenu médian 2021`, value:fmt(revMed), unit:"€/an", color:"#fbbf24"},
+    {label:`Dette/hab. ${fL.year}`, value:fmt(detteHab), unit:"€", color:"#f87171"},
+    {label:`Épargne brute/hab.`, value:fmt(eprHab), unit:"€", color:"#34d399"},
+  ].map(k => `
+    <div class="kpi">
+      <div class="kpi-label">${k.label}</div>
+      <div class="kpi-value" style="color:${k.color}">${k.value}${k.unit?`<span class="unit">${k.unit}</span>`:""}</div>
+      ${k.delta!=null?`<div class="kpi-delta ${k.delta<0?"delta-neg":"delta-pos"}">${k.delta>0?"▲":"▼"} ${Math.abs(k.delta).toFixed(1)}%</div>`:""}
+    </div>`).join("");
+
+  // SYNTHÈSE
+  document.getElementById("synth").innerHTML = [
+    {label:"Population", value:`${popEvol.toFixed(1)}%`, note:`${pF.year}→${pL.year}`, color:"#f87171"},
+    {label:"Dette / hab.", value:fmt(detteHab), note:`€ en ${fL.year}`, color:"#f87171"},
+    {label:"Épargne brute/hab.", value:fmt(eprHab), note:`€ en ${fL.year}`, color:"#34d399"},
+    {label:"Revenu médian", value:fmt(revMed), note:"€/an en 2021", color:"#fbbf24"},
+  ].map(s => `
+    <div class="si">
+      <div class="sl">${s.label}</div>
+      <div class="sv" style="color:${s.color}">${s.value}</div>
+      <div class="sn">${s.note}</div>
+    </div>`).join("");
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // DÉMOGRAPHIE
+  // ══════════════════════════════════════════════════════════════════════════
+  const popYrs = [...new Set(codes.flatMap(c=>D.population[c]?.series.map(s=>s.year)||[]))].sort().map(String);
+  const base06 = {};
+  codes.forEach(c => {
+    const f = D.population[c]?.series.find(s => String(s.year) === String(popYrs[0]));
+    base06[c] = f?.value || null;
+  });
+
+  const annPop = buildAnnotations(popYrs, MK);
 
   // Population absolue
-  mc("chart-pop-abs",{type:"line",data:{labels:popYrs,datasets:C.map(({code,nom})=>({label:nom,data:popYrs.map(y=>{const p=D.population[code].series.find(s=>s.year===y);return p?p.value:null;}),borderColor:COLORS[code],backgroundColor:COLORS[code]+"22",borderWidth:code==="21425"?3:1.5,pointRadius:code==="21425"?4:2,tension:0.3,spanGaps:false}))},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:LEG,tooltip:TT},scales:{x:{grid:GRID},y:{grid:GRID,ticks:{callback:v=>fmt(v)}}}}});
+  mc("c-pop-abs", {
+    type: "line",
+    data: {
+      labels: popYrs,
+      datasets: codes.map(c => ({
+        label: C[c],
+        data: D.population[c]?.series.map(s => s.value) || [],
+        borderColor: COL[c], backgroundColor: COL[c]+"22",
+        borderWidth: c===M?3:1.5, pointRadius: c===M?3:1, tension:.3, fill:false,
+      })),
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: LEG, tooltip: TT, annotation: annPop },
+      scales: { x:{grid:GRID}, y:{grid:GRID, ticks:{callback:v=>fmt(v)}} },
+    },
+  });
 
-  // Population indicée
-  mc("chart-pop-idx",{type:"line",data:{labels:popYrs,datasets:C.map(({code,nom})=>({label:nom,data:popYrs.map(y=>{const p=D.population[code].series.find(s=>s.year===y);return(p&&base75[code])?(p.value/base75[code]*100):null;}),borderColor:COLORS[code],borderWidth:code==="21425"?3:1.5,pointRadius:0,tension:0.3,spanGaps:false,fill:false}))},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:LEG,tooltip:TT},scales:{x:{grid:GRID},y:{grid:GRID,min:45,max:110}}}});
+  // Indice base 100
+  mc("c-pop-idx", {
+    type: "line",
+    data: {
+      labels: popYrs,
+      datasets: codes.map(c => ({
+        label: C[c],
+        data: D.population[c]?.series.map(s => base06[c] ? +(s.value/base06[c]*100).toFixed(1) : null) || [],
+        borderColor: COL[c], borderWidth: c===M?3:1.5, pointRadius:0, tension:.3, fill:false,
+      })),
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: LEG, tooltip: TT, annotation: annPop },
+      scales: { x:{grid:GRID}, y:{grid:GRID, min:75, max:105} },
+    },
+  });
 
-  // Pyramide
-  const pyr=D.demographie["21425"].pyramide_2022;
-  mc("chart-pyramide",{type:"bar",data:{labels:Object.keys(pyr),datasets:[{label:"% population",data:Object.values(pyr),backgroundColor:Object.keys(pyr).map((_,i)=>`hsl(43,96%,${72-i*7}%)`),borderWidth:0}]},options:{indexAxis:"y",responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:TT},scales:{x:{grid:GRID,ticks:{callback:v=>`${v}%`}},y:{grid:{display:false}}}}});
+  // PYRAMIDE DES ÂGES — Montbard 2022
+  const ageOrder = ["Y_LT15","Y15T24","Y25T39","Y40T54","Y55T64","Y65T79","Y_GE80"];
+  const ageLabels = {
+    "Y_LT15":"<15", "Y15T24":"15-24", "Y25T39":"25-39", "Y40T54":"40-54",
+    "Y55T64":"55-64", "Y65T79":"65-79", "Y_GE80":"80+"
+  };
+  const pyrM = ageOrder.map(a => -(D.population_age[M].millesimes["2022"]?.[a]?.M || 0));
+  const pyrF = ageOrder.map(a =>  +(D.population_age[M].millesimes["2022"]?.[a]?.F || 0));
 
-  // Natalité
-  const demo=D.demographie["21425"].indicateurs;
-  mc("chart-natalite",{type:"bar",data:{labels:demo.map(d=>d.year),datasets:[{label:"Natalité (‰)",data:demo.map(d=>d.taux_natalite),backgroundColor:"#34d39966",borderColor:"#34d399",borderWidth:1},{label:"Mortalité (‰)",data:demo.map(d=>d.taux_mortalite),backgroundColor:"#f8717166",borderColor:"#f87171",borderWidth:1}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:LEG,tooltip:TT},scales:{x:{grid:GRID},y:{grid:GRID}}}});
+  mc("c-pyramide", {
+    type: "bar",
+    data: {
+      labels: ageOrder.map(a => ageLabels[a]),
+      datasets: [
+        { label:"Hommes", data:pyrM, backgroundColor:"#60a5fa88", borderColor:"#60a5fa", borderWidth:1 },
+        { label:"Femmes", data:pyrF, backgroundColor:"#f472b688", borderColor:"#f472b6", borderWidth:1 },
+      ],
+    },
+    options: {
+      indexAxis: "y", responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: LEG,
+        tooltip: { ...TT, callbacks: { label: ctx => `${ctx.dataset.label}: ${fmt(Math.abs(ctx.raw))} hab.` } },
+      },
+      scales: {
+        x: { stacked:false, grid:GRID, ticks: { callback: v => fmt(Math.abs(v)) } },
+        y: { stacked:true, grid:{display:false} },
+      },
+    },
+  });
 
-  // Revenus
-  mc("chart-revenus",{type:"line",data:{labels:revYrs,datasets:C.map(({code,nom})=>({label:nom,data:revYrs.map(y=>{const p=D.revenus[code].series.find(s=>s.year===y);return p?p.median:null;}),borderColor:COLORS[code],borderWidth:code==="21425"?3:1.5,pointRadius:code==="21425"?4:2,tension:0.3,fill:false}))},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:LEG,tooltip:TT},scales:{x:{grid:GRID},y:{grid:GRID,ticks:{callback:v=>`${(v/1000).toFixed(0)}k€`}}}}});
+  // Part des 65+
+  const seniors = (code, year) => {
+    const tot = D.population_age[code]?.millesimes[String(year)]?._T?._T;
+    const ge65 = D.population_age[code]?.millesimes[String(year)]?.Y_GE65?._T;
+    return (tot && ge65) ? +(ge65/tot*100).toFixed(1) : null;
+  };
+  const ageYrs = ["2011","2016","2022"];
+  mc("c-seniors", {
+    type: "line",
+    data: {
+      labels: ageYrs,
+      datasets: codes.map(c => ({
+        label: C[c],
+        data: ageYrs.map(y => seniors(c, y)),
+        borderColor: COL[c], borderWidth: c===M?3:1.5, pointRadius: c===M?5:3, tension:.3, fill:false,
+      })),
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: LEG, tooltip: { ...TT, callbacks: { label: ctx => `${ctx.dataset.label}: ${ctx.raw}%` } } },
+      scales: { x:{grid:GRID}, y:{grid:GRID, ticks:{callback:v=>`${v}%`}} },
+    },
+  });
 
-  // Pauvreté
-  mc("chart-pauvrete",{type:"bar",data:{labels:revYrs,datasets:C.map(({code,nom})=>({label:nom,data:revYrs.map(y=>{const p=D.revenus[code].series.find(s=>s.year===y);return p?p.pauvrete:null;}),backgroundColor:COLORS[code]+"99",borderColor:COLORS[code],borderWidth:1}))},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:LEG,tooltip:TT},scales:{x:{grid:GRID},y:{grid:GRID,ticks:{callback:v=>`${v}%`}}}}});
+  // ══════════════════════════════════════════════════════════════════════════
+  // LOGEMENT
+  // ══════════════════════════════════════════════════════════════════════════
+  // Filtre standard : RP_MEASURE=DWELLINGS + toutes dimensions = _T sauf OCS
+  function getLogement(code, year, ocs) {
+    return getDim(D.logement[code].millesimes, year, {
+      BUILD_END:"_T", CARPARK:"_T", CARS:"_T", L_STAY:"_T", NOR:"_T",
+      NRG_SRC:"_T", OCS:ocs, RP_MEASURE:"DWELLINGS", TDW:"_T", TSH:"_T",
+    });
+  }
 
-  // Emploi
-  const empD=D.emploi["21425"].series;
-  mc("chart-emploi",{type:"bar",data:{labels:empYrs,datasets:[{type:"bar",label:"Emploi salarié",data:empD.map(s=>s.emploi_salarie),backgroundColor:"#60a5fa66",borderColor:"#60a5fa",borderWidth:1,yAxisID:"y"},{type:"line",label:"Chômage ZE (%)",data:empD.map(s=>s.chomage_ze),borderColor:"#f87171",borderWidth:2.5,pointRadius:3,tension:0.3,yAxisID:"y2",fill:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:LEG,tooltip:TT},scales:{x:{grid:GRID},y:{grid:GRID,position:"left",ticks:{color:"#60a5fa"}},y2:{grid:{display:false},position:"right",ticks:{callback:v=>`${v}%`,color:"#f87171"}}}}});
+  const logYrs = ["2011","2016","2022"];
+  const logTypes = [
+    {ocs:"DW_MAIN", label:"Résidences principales", color:"#34d399"},
+    {ocs:"DW_VAC", label:"Logements vacants", color:"#f87171"},
+    {ocs:"DW_SEC_DW_OCC", label:"Résidences secondaires", color:"#a78bfa"},
+  ];
 
-  // Créations
-  mc("chart-creations",{type:"line",data:{labels:entYrs,datasets:C.map(({code,nom})=>({label:nom,data:entYrs.map(y=>{const p=D.entreprises[code].series.find(s=>s.year===y);return p?p.creations:null;}),borderColor:COLORS[code],borderWidth:code==="21425"?3:1.5,pointRadius:code==="21425"?4:2,tension:0.3,fill:false}))},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:LEG,tooltip:TT},scales:{x:{grid:GRID},y:{grid:GRID}}}});
+  mc("c-logement", {
+    type: "bar",
+    data: {
+      labels: logYrs,
+      datasets: logTypes.map(t => ({
+        label: t.label,
+        data: logYrs.map(y => getLogement(M, y, t.ocs)),
+        backgroundColor: t.color+"66", borderColor: t.color, borderWidth: 1, stack: "l",
+      })),
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: LEG, tooltip: TT },
+      scales: { x:{grid:GRID, stacked:true}, y:{grid:GRID, stacked:true} },
+    },
+  });
 
-  // Secteurs
-  const sD=D.entreprises["21425"].series;
-  mc("chart-secteurs",{type:"bar",data:{labels:entYrs,datasets:[{label:"Industrie",data:sD.map(s=>s.industrie),backgroundColor:"#ef444466",borderColor:"#ef4444",borderWidth:1,stack:"s"},{label:"Commerce",data:sD.map(s=>s.commerce),backgroundColor:"#fbbf2466",borderColor:"#fbbf24",borderWidth:1,stack:"s"},{label:"Services",data:sD.map(s=>s.services),backgroundColor:"#60a5fa66",borderColor:"#60a5fa",borderWidth:1,stack:"s"}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:LEG,tooltip:TT},scales:{x:{grid:GRID,stacked:true},y:{grid:GRID,stacked:true}}}});
+  // Taux de vacance 2022 comparé
+  function tauxVacance(code, year) {
+    const main = getLogement(code, year, "DW_MAIN");
+    const vac = getLogement(code, year, "DW_VAC");
+    const sec = getLogement(code, year, "DW_SEC_DW_OCC");
+    const tot = (main||0) + (vac||0) + (sec||0);
+    return tot ? +(vac/tot*100).toFixed(1) : null;
+  }
+  mc("c-vacance", {
+    type: "bar",
+    data: {
+      labels: codes.map(c => C[c]),
+      datasets: [{
+        label: "Taux de vacance 2022 (%)",
+        data: codes.map(c => tauxVacance(c, "2022")),
+        backgroundColor: codes.map(c => COL[c]+"99"),
+        borderColor: codes.map(c => COL[c]),
+        borderWidth: 1,
+      }],
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { ...TT, callbacks: { label: ctx => `${ctx.raw}%` } } },
+      scales: { x:{grid:{display:false}}, y:{grid:GRID, ticks:{callback:v=>`${v}%`}} },
+    },
+  });
 
-  // Logement
-  const lD=D.logement["21425"].series;
-  mc("chart-logement",{type:"bar",data:{labels:logYrs,datasets:[{label:"Résidences principales",data:lD.map(s=>s.principales),backgroundColor:"#34d39966",borderColor:"#34d399",borderWidth:1,stack:"l"},{label:"Logements vacants",data:lD.map(s=>s.vacants),backgroundColor:"#f8717166",borderColor:"#f87171",borderWidth:1,stack:"l"},{label:"Résidences secondaires",data:lD.map(s=>s.secondaires),backgroundColor:"#a78bfa66",borderColor:"#a78bfa",borderWidth:1,stack:"l"}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:LEG,tooltip:TT},scales:{x:{grid:GRID,stacked:true},y:{grid:GRID,stacked:true}}}});
+  // ══════════════════════════════════════════════════════════════════════════
+  // ACTIVITÉ & EMPLOI
+  // ══════════════════════════════════════════════════════════════════════════
+  // Actifs occupés (EMPSTA_ENQ=1) pour les 15 ans et plus
+  // Le dataset DS_RP_ACTIVITE_PRINC ne contient que les actifs occupés détaillés —
+  // pas les chômeurs ni le taux d'activité directement.
+  function actifsOccupes(code, year) {
+    const data = D.activite[code]?.millesimes[String(year)];
+    if (!data) return null;
+    for (const [key, val] of Object.entries(data)) {
+      const dims = Object.fromEntries(key.split("|").map(p => p.split("=")));
+      if (dims.AGE === "Y_GE15" && dims.SEX === "_T" && dims.WKTIME === "_T"
+          && dims.EMPFORM === "_T" && dims.EMPSTA_ENQ === "1"
+          && dims.RP_MEASURE === "POP") return val;
+    }
+    return null;
+  }
 
-  // Vacance comparative
-  mc("chart-vacance",{type:"bar",data:{labels:C.map(c=>c.nom),datasets:[{label:"1999",data:C.map(({code})=>{const s=D.logement[code].series[0];return s?+(s.vacants/s.total*100).toFixed(1):null;}),backgroundColor:"#47556999",borderColor:"#475569",borderWidth:1},{label:"2022",data:C.map(({code})=>{const s=D.logement[code].series[D.logement[code].series.length-1];return s?+(s.vacants/s.total*100).toFixed(1):null;}),backgroundColor:"#f8717199",borderColor:"#f87171",borderWidth:1}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:LEG,tooltip:TT},scales:{x:{grid:{display:false}},y:{grid:GRID,ticks:{callback:v=>`${v}%`}}}}});
+  // Taux d'emploi approximé : actifs occupés / population
+  function tauxEmploi(code, year) {
+    const actifs = actifsOccupes(code, year);
+    const popTot = D.population_age[code]?.millesimes[String(year)]?._T?._T;
+    return (actifs && popTot) ? +(actifs/popTot*100).toFixed(1) : null;
+  }
 
-  // === FINANCES ===
-  const fD=D.finances["21425"].series;
-  const finYrs2=fD.map(s=>s.year);
+  const actYrs = ["2011","2016","2022"];
 
-  // Helper : données par commune pour un champ
-  const finC=(field)=>C.map(({code,nom})=>({
-    label:nom,
-    data:finYrs2.map(y=>{const r=D.finances[code]?.series.find(s=>s.year===y);return r&&r[field]!=null?Math.round(r[field]):null;}),
-    borderColor:COLORS[code],backgroundColor:COLORS[code]+"33",
-    borderWidth:code==="21425"?3:1.5,pointRadius:code==="21425"?4:2,tension:0.3,fill:false,spanGaps:false
-  }));
-  const finCHab=(field)=>C.map(({code,nom})=>({
-    label:nom,
-    data:finYrs2.map(y=>{const r=D.finances[code]?.series.find(s=>s.year===y);return(r&&r[field]!=null&&r.pop_dgf)?Math.round(r[field]/r.pop_dgf):null;}),
-    borderColor:COLORS[code],backgroundColor:COLORS[code]+"33",
-    borderWidth:code==="21425"?3:1.5,pointRadius:code==="21425"?4:2,tension:0.3,fill:false,spanGaps:false
-  }));
+  // Graphique 1 : nombre d'actifs occupés (4 communes)
+  mc("c-activite", {
+    type: "line",
+    data: {
+      labels: actYrs,
+      datasets: codes.map(c => ({
+        label: C[c],
+        data: actYrs.map(y => actifsOccupes(c, y)),
+        borderColor: COL[c], borderWidth: c===M?3:1.5, pointRadius: c===M?5:3, tension:.3, fill:false,
+      })),
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: LEG, tooltip: { ...TT, callbacks: { label: ctx => `${ctx.dataset.label}: ${fmt(ctx.raw)} actifs` } } },
+      scales: { x:{grid:GRID}, y:{grid:GRID, ticks:{callback:v=>fmt(v)}} },
+    },
+  });
 
-  // Budget fonctionnement (Montbard, barres + ligne épargne)
-  mc("chart-budget",{type:"bar",data:{labels:finYrs2,datasets:[
-    {type:"bar",label:"Recettes fonct.",data:fD.map(s=>s.recettes_fonct?Math.round(s.recettes_fonct):null),backgroundColor:"#34d39955",borderColor:"#34d399",borderWidth:1},
-    {type:"bar",label:"Dépenses fonct.",data:fD.map(s=>s.depenses_fonct?Math.round(s.depenses_fonct):null),backgroundColor:"#f8717155",borderColor:"#f87171",borderWidth:1},
-    {type:"line",label:"Épargne brute",data:fD.map(s=>s.epargne_brute?Math.round(s.epargne_brute):null),borderColor:"#fbbf24",borderWidth:2.5,pointRadius:4,tension:0.3,fill:false,yAxisID:"y"}
-  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:LEG,tooltip:{...TT,callbacks:{label:ctx=>`${ctx.dataset.label}: ${(ctx.raw/1e6).toFixed(2)} M€`}}},scales:{x:{grid:GRID},y:{grid:GRID,ticks:{callback:v=>`${(v/1e6).toFixed(1)}M€`}}}}});
+  // Graphique 2 : taux d'emploi approximé Montbard
+  mc("c-chomage", {
+    type: "line",
+    data: {
+      labels: actYrs,
+      datasets: [{
+        label: "Taux d'emploi (% population)",
+        data: actYrs.map(y => tauxEmploi(M, y)),
+        borderColor: "#34d399", backgroundColor: "#34d39922",
+        borderWidth: 3, pointRadius: 5, tension: .3, fill: true,
+      }],
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { ...TT, callbacks: { label: ctx => `${ctx.raw}%` } } },
+      scales: { x:{grid:GRID}, y:{grid:GRID, ticks:{callback:v=>`${v}%`}} },
+    },
+  });
 
-  // Encours de dette absolu (Montbard)
-  mc("chart-dette-abs",{type:"line",data:{labels:finYrs2,datasets:[{label:"Encours de dette",data:fD.map(s=>s.dette?Math.round(s.dette):null),borderColor:"#f87171",backgroundColor:"#f8717122",borderWidth:2.5,pointRadius:4,tension:0.3,fill:true}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:ctx=>`${(ctx.raw/1e6).toFixed(2)} M€`}}},scales:{x:{grid:GRID},y:{grid:GRID,ticks:{callback:v=>`${(v/1e6).toFixed(1)}M€`}}}}});
+  // ══════════════════════════════════════════════════════════════════════════
+  // REVENUS
+  // ══════════════════════════════════════════════════════════════════════════
+  const revMedComm = code => getDim(D.revenus[code].millesimes, 2021,
+    { FILOSOFI_MEASURE:"MED_SL", UNIT_MEASURE:"EUR_YR" });
+  const revPauvreteComm = code => getDim(D.revenus[code].millesimes, 2021,
+    { FILOSOFI_MEASURE:"PR_MD60", UNIT_MEASURE:"PT" });
 
-  // Dette par habitant comparée
-  mc("chart-dette-hab",{type:"line",data:{labels:finYrs2,datasets:finCHab("dette")},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:LEG,tooltip:TT},scales:{x:{grid:GRID},y:{grid:GRID,ticks:{callback:v=>`${v} €`}}}}});
+  mc("c-rev-median", {
+    type: "bar",
+    data: {
+      labels: codes.map(c => C[c]),
+      datasets: [{
+        label: "Revenu médian 2021 (€/an)",
+        data: codes.map(c => revMedComm(c)),
+        backgroundColor: codes.map(c => COL[c]+"99"),
+        borderColor: codes.map(c => COL[c]),
+        borderWidth: 1,
+      }],
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { ...TT, callbacks: { label: ctx => `${fmt(ctx.raw)} €/an` } } },
+      scales: { x:{grid:{display:false}}, y:{grid:GRID, ticks:{callback:v=>`${(v/1000).toFixed(0)}k€`}} },
+    },
+  });
 
-  // Annuité de la dette
-  mc("chart-annuite",{type:"bar",data:{labels:finYrs2,datasets:[{label:"Annuité dette",data:fD.map(s=>s.annuite_dette?Math.round(s.annuite_dette):null),backgroundColor:"#f4720b55",borderColor:"#f4720b",borderWidth:1}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:ctx=>`${(ctx.raw/1e6).toFixed(2)} M€`}}},scales:{x:{grid:GRID},y:{grid:GRID,ticks:{callback:v=>`${(v/1e6).toFixed(1)}M€`}}}}});
+  mc("c-pauvrete", {
+    type: "bar",
+    data: {
+      labels: codes.map(c => C[c]),
+      datasets: [{
+        label: "Taux de pauvreté 2021 (%)",
+        data: codes.map(c => revPauvreteComm(c)),
+        backgroundColor: codes.map(c => COL[c]+"99"),
+        borderColor: codes.map(c => COL[c]),
+        borderWidth: 1,
+      }],
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { ...TT, callbacks: { label: ctx => `${ctx.raw}%` } } },
+      scales: { x:{grid:{display:false}}, y:{grid:GRID, ticks:{callback:v=>`${v}%`}} },
+    },
+  });
 
-  // Dépenses investissement comparées
-  mc("chart-invest",{type:"line",data:{labels:finYrs2,datasets:finC("depenses_invest")},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:LEG,tooltip:{...TT,callbacks:{label:ctx=>`${(ctx.raw/1e6).toFixed(2)} M€`}}},scales:{x:{grid:GRID},y:{grid:GRID,ticks:{callback:v=>`${(v/1e6).toFixed(1)}M€`}}}}});
+  // Revenu médian par âge fiscal — Montbard 2021
+  // Codes TPH_FISCAL : 21=<30 ans, 110=30-49, 222=50-59, 221=60-74, 3=75+ (vérification)
+  const ageFiscalLabels = {
+    "21": "Moins de 30 ans",
+    "110": "30-49 ans",
+    "222_FILOSOFI": "50-59 ans",
+    "221_FILOSOFI": "60-74 ans",
+    "3": "75 ans et +",
+  };
+  const ageFiscalOrder = ["21","110","222_FILOSOFI","221_FILOSOFI","3"];
+  const revByAge = ageFiscalOrder.map(tph =>
+    getDim(D.revenus[M].millesimes, 2021, { FILOSOFI_MEASURE:"MED_SL", TPH_FISCAL:tph, UNIT_MEASURE:"EUR_YR" })
+  );
 
-  // Équipement par habitant comparé
-  mc("chart-equipement-hab",{type:"line",data:{labels:finYrs2,datasets:finCHab("equipement")},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:LEG,tooltip:TT},scales:{x:{grid:GRID},y:{grid:GRID,ticks:{callback:v=>`${v} €`}}}}});
+  mc("c-rev-age", {
+    type: "bar",
+    data: {
+      labels: ageFiscalOrder.map(t => ageFiscalLabels[t]),
+      datasets: [{
+        label: "Revenu médian (€/an)",
+        data: revByAge,
+        backgroundColor: ageFiscalOrder.map((_,i) => `hsl(43,96%,${72-i*7}%)`),
+        borderWidth: 0,
+      }],
+    },
+    options: {
+      indexAxis: "y", responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { ...TT, callbacks: { label: ctx => `${fmt(ctx.raw)} €/an` } } },
+      scales: { x:{grid:GRID, ticks:{callback:v=>`${(v/1000).toFixed(0)}k€`}}, y:{grid:{display:false}} },
+    },
+  });
 
-  // Impôts locaux absolus (Montbard)
-  mc("chart-impots",{type:"bar",data:{labels:finYrs2,datasets:[{label:"Impôts locaux",data:fD.map(s=>s.impots_locaux?Math.round(s.impots_locaux):null),backgroundColor:"#a78bfa55",borderColor:"#a78bfa",borderWidth:1}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:ctx=>`${(ctx.raw/1e6).toFixed(2)} M€`}}},scales:{x:{grid:GRID},y:{grid:GRID,ticks:{callback:v=>`${(v/1e6).toFixed(1)}M€`}}}}});
+  // ══════════════════════════════════════════════════════════════════════════
+  // FINANCES
+  // ══════════════════════════════════════════════════════════════════════════
+  const fYrs = D.finances[M].series.map(s => String(s.year));
+  const annFin = buildAnnotations(fYrs, MK);
 
-  // Impôts locaux par habitant comparés
-  mc("chart-impots-hab",{type:"line",data:{labels:finYrs2,datasets:finCHab("impots_locaux")},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:LEG,tooltip:TT},scales:{x:{grid:GRID},y:{grid:GRID,ticks:{callback:v=>`${v} €`}}}}});
+  function dsAbs(field) {
+    return codes.map(c => ({
+      label: C[c],
+      data: fYrs.map(y => {
+        const r = D.finances[c]?.series.find(s => String(s.year) === String(y));
+        return r && r[field] != null ? r[field] : null;
+      }),
+      borderColor: COL[c], backgroundColor: COL[c]+"22",
+      borderWidth: c===M?3:1.5, pointRadius: 0, tension: .3, fill: false, spanGaps: false,
+    }));
+  }
+  function dsHab(field) {
+    return codes.map(c => ({
+      label: C[c],
+      data: fYrs.map(y => {
+        const r = D.finances[c]?.series.find(s => String(s.year) === String(y));
+        const pop = r?.pop_dgf;
+        return (r && r[field] != null && pop) ? Math.round(r[field]/pop) : null;
+      }),
+      borderColor: COL[c], backgroundColor: COL[c]+"22",
+      borderWidth: c===M?3:1.5, pointRadius: 0, tension: .3, fill: false, spanGaps: false,
+    }));
+  }
 
-  // Frais personnel en % dépenses fonct
-  mc("chart-personnel",{type:"line",data:{labels:finYrs2,datasets:C.map(({code,nom})=>({
-    label:nom,
-    data:finYrs2.map(y=>{const r=D.finances[code]?.series.find(s=>s.year===y);return(r&&r.frais_personnel&&r.depenses_fonct)?+((r.frais_personnel/r.depenses_fonct)*100).toFixed(1):null;}),
-    borderColor:COLORS[code],borderWidth:code==="21425"?3:1.5,pointRadius:code==="21425"?4:2,tension:0.3,fill:false,spanGaps:false
-  }))},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:LEG,tooltip:TT},scales:{x:{grid:GRID},y:{grid:GRID,ticks:{callback:v=>`${v}%`}}}}});
+  // Budget Montbard
+  mc("c-budget", {
+    type: "bar",
+    data: {
+      labels: fYrs,
+      datasets: [
+        {type:"bar", label:"Recettes fonct.", data:fM.map(s=>s.recettes_fonct),
+         backgroundColor:"#34d39944", borderColor:"#34d399", borderWidth:1},
+        {type:"bar", label:"Dépenses fonct.", data:fM.map(s=>s.depenses_fonct),
+         backgroundColor:"#f8717144", borderColor:"#f87171", borderWidth:1},
+        {type:"line", label:"Épargne brute", data:fM.map(s=>s.epargne_brute),
+         borderColor:"#fbbf24", borderWidth:2.5, pointRadius:0, tension:.3, fill:false},
+      ],
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: LEG, tooltip: { ...TT, callbacks: { label: ctx => fmtM(ctx.raw) } }, annotation: annFin },
+      scales: { x:{grid:GRID}, y:{grid:GRID, ticks:{callback:v=>fmtM(v)}} },
+    },
+  });
 
-  // Épargne brute par habitant comparée
-  mc("chart-epargne-hab",{type:"line",data:{labels:finYrs2,datasets:finCHab("epargne_brute")},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:LEG,tooltip:TT},scales:{x:{grid:GRID},y:{grid:GRID,ticks:{callback:v=>`${v} €`}}}}});
+  // Dette absolue
+  mc("c-dette-abs", {
+    type: "line",
+    data: { labels: fYrs, datasets: [{
+      label: "Encours de dette",
+      data: fM.map(s => s.dette),
+      borderColor: "#f87171", backgroundColor: "#f8717122",
+      borderWidth: 2.5, pointRadius: 0, tension: .3, fill: true,
+    }]},
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { ...TT, callbacks: { label: ctx => fmtM(ctx.raw) } }, annotation: annFin },
+      scales: { x:{grid:GRID}, y:{grid:GRID, ticks:{callback:v=>fmtM(v)}} },
+    },
+  });
 
-  // Volet politique supprimé
+  // Dette/hab comparée
+  mc("c-dette-hab", {
+    type: "line",
+    data: { labels: fYrs, datasets: dsHab("dette") },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: LEG, tooltip: { ...TT, callbacks: { label: ctx => `${C[codes[ctx.datasetIndex]]||ctx.dataset.label}: ${fmt(ctx.raw)} €` } }, annotation: annFin },
+      scales: { x:{grid:GRID}, y:{grid:GRID, ticks:{callback:v=>`${fmt(v)} €`}} },
+    },
+  });
+
+  // Annuité — filtre pour ne garder que les années avec donnée (DGFiP < 2010 = null)
+  const annuiteData = fM.filter(s => s.annuite_dette != null);
+  const annuiteYrs = annuiteData.map(s => String(s.year));
+  const annAnnuite = buildAnnotations(annuiteYrs, MK);
+  mc("c-annuite", {
+    type: "bar",
+    data: { labels: annuiteYrs, datasets: [{
+      label: "Annuité",
+      data: annuiteData.map(s => s.annuite_dette),
+      backgroundColor: "#f4720b44", borderColor: "#f4720b", borderWidth: 1,
+    }]},
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { ...TT, callbacks: { label: ctx => fmtM(ctx.raw) } }, annotation: annAnnuite },
+      scales: { x:{grid:GRID}, y:{grid:GRID, ticks:{callback:v=>fmtM(v)}} },
+    },
+  });
+
+  // Investissement comparé
+  mc("c-invest", {
+    type: "line",
+    data: { labels: fYrs, datasets: dsAbs("depenses_invest") },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: LEG, tooltip: { ...TT, callbacks: { label: ctx => fmtM(ctx.raw) } }, annotation: annFin },
+      scales: { x:{grid:GRID}, y:{grid:GRID, ticks:{callback:v=>fmtM(v)}} },
+    },
+  });
+
+  // Équipement par habitant
+  mc("c-equip-hab", {
+    type: "line",
+    data: { labels: fYrs, datasets: dsHab("equipement") },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: LEG, tooltip: { ...TT, callbacks: { label: ctx => `${fmt(ctx.raw)} €` } }, annotation: annFin },
+      scales: { x:{grid:GRID}, y:{grid:GRID, ticks:{callback:v=>`${fmt(v)} €`}} },
+    },
+  });
+
+  // Impôts locaux
+  mc("c-impots", {
+    type: "bar",
+    data: { labels: fYrs, datasets: [{
+      label: "Impôts locaux",
+      data: fM.map(s => s.impots_locaux),
+      backgroundColor: "#a78bfa44", borderColor: "#a78bfa", borderWidth: 1,
+    }]},
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { ...TT, callbacks: { label: ctx => fmtM(ctx.raw) } }, annotation: annFin },
+      scales: { x:{grid:GRID}, y:{grid:GRID, ticks:{callback:v=>fmtM(v)}} },
+    },
+  });
+
+  // Impôts/hab comparés
+  mc("c-impots-hab", {
+    type: "line",
+    data: { labels: fYrs, datasets: dsHab("impots_locaux") },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: LEG, tooltip: { ...TT, callbacks: { label: ctx => `${fmt(ctx.raw)} €` } }, annotation: annFin },
+      scales: { x:{grid:GRID}, y:{grid:GRID, ticks:{callback:v=>`${fmt(v)} €`}} },
+    },
+  });
+
+  // Frais personnel %
+  mc("c-personnel", {
+    type: "line",
+    data: {
+      labels: fYrs,
+      datasets: codes.map(c => ({
+        label: C[c],
+        data: fYrs.map(y => {
+          const r = D.finances[c]?.series.find(s => String(s.year) === String(y));
+          return (r && r.frais_personnel && r.depenses_fonct) ?
+            +((r.frais_personnel/r.depenses_fonct)*100).toFixed(1) : null;
+        }),
+        borderColor: COL[c], borderWidth: c===M?3:1.5,
+        pointRadius: 0, tension: .3, fill: false, spanGaps: false,
+      })),
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: LEG, tooltip: { ...TT, callbacks: { label: ctx => `${ctx.dataset.label}: ${ctx.raw}%` } }, annotation: annFin },
+      scales: { x:{grid:GRID}, y:{grid:GRID, ticks:{callback:v=>`${v}%`}} },
+    },
+  });
+
+  // Épargne brute / habitant
+  mc("c-epargne-hab", {
+    type: "line",
+    data: { labels: fYrs, datasets: dsHab("epargne_brute") },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: LEG, tooltip: { ...TT, callbacks: { label: ctx => `${fmt(ctx.raw)} €` } }, annotation: annFin },
+      scales: { x:{grid:GRID}, y:{grid:GRID, ticks:{callback:v=>`${fmt(v)} €`}} },
+    },
+  });
 }
 </script>
 </body>

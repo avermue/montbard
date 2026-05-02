@@ -197,7 +197,13 @@ def collect_finances_dgfip(force=False) -> dict:
                 return None
             v = cols[i].strip().strip('"')
             f = safe_float(v)
-            return round(f * 1000) if f is not None else None  # k€ → €
+            if f is None:
+                return None
+            # Convertir 0 → None pour les champs où 0 signifie "donnée absente"
+            # (ex: dette_annuite avant 2010 dans le fichier DGFiP)
+            if f == 0 and col in ("dette_annuite",):
+                return None
+            return round(f * 1000)  # k€ → €
 
         def gi(cols, col):
             i = idx.get(col)
@@ -330,6 +336,210 @@ def collect_finances_ofgl(force=False) -> dict:
 
     return results
 
+
+# ── 4. INSEE Melodi API : recensement par tranche d'âge (2011, 2016, 2022) ───
+
+def _melodi_api_get(dataset_id: str, geo_codes: list, force=False) -> list:
+    """
+    Interroge l'API Melodi /data/{DATASET} pour une liste de communes.
+    Retourne toutes les observations consolidées.
+    """
+    base_url = f"https://api.insee.fr/melodi/data/{dataset_id}"
+    all_obs = []
+
+    for code in geo_codes:
+        # Récupère la première page
+        page = 1
+        while True:
+            params = {"GEO": f"COM-{code}", "page": page}
+            data = fetch_json_api(base_url, params, force)
+            obs = data.get("observations", [])
+            all_obs.extend(obs)
+            # Pagination
+            paging = data.get("paging", {})
+            if "next" not in paging:
+                break
+            page += 1
+            time.sleep(2.1)  # 30 req/min max
+        time.sleep(2.1)
+
+    return all_obs
+
+
+def collect_population_age(force=False) -> dict:
+    """
+    Population par tranche d'âge et sexe — INSEE Melodi DS_RP_POPULATION_PRINC.
+    Disponible pour 2011, 2016, 2022.
+    """
+    log("Population par âge — INSEE Melodi DS_RP_POPULATION_PRINC (2011, 2016, 2022)")
+
+    obs = _melodi_api_get("DS_RP_POPULATION_PRINC", list(COMMUNES), force)
+    if not obs:
+        abort("Aucune observation DS_RP_POPULATION_PRINC")
+
+    # Pivot par {commune, année, tranche, sexe} → valeur
+    results = {c: {"commune": COMMUNES[c], "millesimes": {}} for c in COMMUNES}
+
+    for o in obs:
+        dims = o.get("dimensions", {})
+        geo = dims.get("GEO", "")  # ex: "2025-COM-21425"
+        if "COM-" not in geo:
+            continue
+        code = geo.rsplit("COM-", 1)[1]
+        if code not in COMMUNES:
+            continue
+        year = dims.get("TIME_PERIOD")
+        sex = dims.get("SEX")
+        age = dims.get("AGE")
+        val = o.get("measures", {}).get("OBS_VALUE_NIVEAU", {}).get("value")
+        if not (year and sex and age and val is not None):
+            continue
+        results[code]["millesimes"].setdefault(year, {}).setdefault(age, {})[sex] = round(val)
+
+    for code, info in COMMUNES.items():
+        millesimes = results[code]["millesimes"]
+        if not millesimes:
+            abort(f"Aucune donnée population âge pour {info}")
+        log(f"  {info:25s}: {len(millesimes)} millésimes ({sorted(millesimes)})", "OK")
+
+    return results
+
+
+def collect_logement(force=False) -> dict:
+    """
+    Logements par catégorie — INSEE Melodi DS_RP_LOGEMENT_PRINC.
+    Disponible pour 2011, 2016, 2022.
+    Catégories : résidences principales/secondaires/vacants.
+    """
+    log("Logements — INSEE Melodi DS_RP_LOGEMENT_PRINC")
+
+    obs = _melodi_api_get("DS_RP_LOGEMENT_PRINC", list(COMMUNES), force)
+    if not obs:
+        abort("Aucune observation DS_RP_LOGEMENT_PRINC")
+
+    # Pivot par {commune, année, catégorie}
+    results = {c: {"commune": COMMUNES[c], "millesimes": {}} for c in COMMUNES}
+
+    for o in obs:
+        dims = o.get("dimensions", {})
+        geo = dims.get("GEO", "")
+        if "COM-" not in geo:
+            continue
+        code = geo.rsplit("COM-", 1)[1]
+        if code not in COMMUNES:
+            continue
+        year = dims.get("TIME_PERIOD")
+        val = o.get("measures", {}).get("OBS_VALUE_NIVEAU", {}).get("value")
+        if not (year and val is not None):
+            continue
+        # Toutes les dimensions sont conservées pour pouvoir filtrer après
+        key = "|".join(f"{k}={v}" for k, v in sorted(dims.items()) if k not in ("GEO", "TIME_PERIOD"))
+        results[code]["millesimes"].setdefault(year, {})[key] = round(val)
+
+    for code, info in COMMUNES.items():
+        if not results[code]["millesimes"]:
+            abort(f"Aucune donnée logement pour {info}")
+        log(f"  {info:25s}: {len(results[code]['millesimes'])} millésimes", "OK")
+
+    return results
+
+
+def collect_activite(force=False) -> dict:
+    """
+    Activité 15-64 ans — INSEE Melodi DS_RP_ACTIVITE_PRINC.
+    Couvre actifs/inactifs/chômeurs par sexe.
+    """
+    log("Activité 15-64 — INSEE Melodi DS_RP_ACTIVITE_PRINC")
+
+    obs = _melodi_api_get("DS_RP_ACTIVITE_PRINC", list(COMMUNES), force)
+    if not obs:
+        abort("Aucune observation DS_RP_ACTIVITE_PRINC")
+
+    results = {c: {"commune": COMMUNES[c], "millesimes": {}} for c in COMMUNES}
+
+    for o in obs:
+        dims = o.get("dimensions", {})
+        geo = dims.get("GEO", "")
+        if "COM-" not in geo:
+            continue
+        code = geo.rsplit("COM-", 1)[1]
+        if code not in COMMUNES:
+            continue
+        year = dims.get("TIME_PERIOD")
+        val = o.get("measures", {}).get("OBS_VALUE_NIVEAU", {}).get("value")
+        if not (year and val is not None):
+            continue
+        key = "|".join(f"{k}={v}" for k, v in sorted(dims.items()) if k not in ("GEO", "TIME_PERIOD"))
+        results[code]["millesimes"].setdefault(year, {})[key] = round(val)
+
+    for code, info in COMMUNES.items():
+        if not results[code]["millesimes"]:
+            abort(f"Aucune donnée activité pour {info}")
+        log(f"  {info:25s}: {len(results[code]['millesimes'])} millésimes", "OK")
+
+    return results
+
+
+def collect_revenus(force=False) -> dict:
+    """
+    Revenus & pauvreté — INSEE Melodi DS_FILOSOFI_CC + DS_FILOSOFI_MEN_TP_NIVVIE.
+    Note : seule l'année 2021 est exposée par l'API JSON (millésime le plus récent).
+    """
+    log("Revenus FiLoSoFi — INSEE Melodi DS_FILOSOFI_CC")
+
+    obs = _melodi_api_get("DS_FILOSOFI_CC", list(COMMUNES), force)
+    if not obs:
+        abort("Aucune observation DS_FILOSOFI_CC")
+
+    results = {c: {"commune": COMMUNES[c], "millesimes": {}} for c in COMMUNES}
+
+    for o in obs:
+        dims = o.get("dimensions", {})
+        geo = dims.get("GEO", "")
+        if "COM-" not in geo:
+            continue
+        code = geo.rsplit("COM-", 1)[1]
+        if code not in COMMUNES:
+            continue
+        year = dims.get("TIME_PERIOD")
+        val = o.get("measures", {}).get("OBS_VALUE_NIVEAU", {}).get("value")
+        if not (year and val is not None):
+            continue
+        key = "|".join(f"{k}={v}" for k, v in sorted(dims.items()) if k not in ("GEO", "TIME_PERIOD"))
+        results[code]["millesimes"].setdefault(year, {})[key] = val
+
+    log("Pauvreté FiLoSoFi — INSEE Melodi DS_FILOSOFI_MEN_TP_NIVVIE")
+    obs_pov = _melodi_api_get("DS_FILOSOFI_MEN_TP_NIVVIE", list(COMMUNES), force)
+
+    pov_results = {c: {"millesimes": {}} for c in COMMUNES}
+    for o in obs_pov:
+        dims = o.get("dimensions", {})
+        geo = dims.get("GEO", "")
+        if "COM-" not in geo:
+            continue
+        code = geo.rsplit("COM-", 1)[1]
+        if code not in COMMUNES:
+            continue
+        year = dims.get("TIME_PERIOD")
+        val = o.get("measures", {}).get("OBS_VALUE_NIVEAU", {}).get("value")
+        if not (year and val is not None):
+            continue
+        key = "|".join(f"{k}={v}" for k, v in sorted(dims.items()) if k not in ("GEO", "TIME_PERIOD"))
+        pov_results[code]["millesimes"].setdefault(year, {})[key] = val
+
+    # Merge dans results
+    for code in COMMUNES:
+        for year, data in pov_results[code]["millesimes"].items():
+            results[code]["millesimes"].setdefault(year, {}).update(data)
+
+    for code, info in COMMUNES.items():
+        if not results[code]["millesimes"]:
+            abort(f"Aucune donnée revenus/pauvreté pour {info}")
+        log(f"  {info:25s}: {len(results[code]['millesimes'])} millésimes", "OK")
+
+    return results
+
+
 # ── Main ──────────────────────────────────────────────────────────────────────
 
 def main(force=False):
@@ -342,8 +552,16 @@ def main(force=False):
     log("Observatoire Montbard — Collecte des données")
     log("=" * 60)
 
-    # Population
+    # Population (1968-2023)
     population = collect_population(force)
+
+    # Recensement par âge / logements / activité (2011, 2016, 2022)
+    population_age  = collect_population_age(force)
+    logement        = collect_logement(force)
+    activite        = collect_activite(force)
+
+    # Revenus & pauvreté (2021)
+    revenus = collect_revenus(force)
 
     # Finances : DGFiP 2000-2016 + OFGL 2017-2024
     fin_dgfip = collect_finances_dgfip(force)
@@ -359,17 +577,34 @@ def main(force=False):
         finances[code] = {"commune": nom, "series": merged}
         log(f"  {nom:25s}: {len(merged)} années ({merged[0]['year']}–{merged[-1]['year']})", "OK")
 
+    # Marqueurs historiques (validés par sources)
+    marqueurs = {
+        "tgv":            {"year": 1981, "label": "TGV", "type": "infra"},
+        "maire_protte":   {"year": 1995, "label": "M.P.",  "type": "maire", "nom": "Michel Protte"},
+        "maire_silvestre":{"year": 2008, "label": "C.S.",  "type": "maire", "nom": "Christelle Silvestre"},
+        "maire_porte":    {"year": 2014, "label": "L.P.",  "type": "maire", "nom": "Laurence Porte"},
+    }
+
     output = {
         "meta": {
             "communes":     COMMUNES,
             "collect_date": pd.Timestamp.now().isoformat(),
+            "marqueurs":    marqueurs,
             "sources": {
-                "population": "INSEE Melodi DS_POPULATIONS_HISTORIQUES (ZIP public, PMUN 1968-2023)",
-                "finances":   "DGFiP data.gouv.fr 2000-2016 + OFGL 2017-2024 (cbudg=1)",
+                "population":      "INSEE Melodi DS_POPULATIONS_HISTORIQUES (PMUN 1968-2023)",
+                "population_age":  "INSEE Melodi DS_RP_POPULATION_PRINC (2011, 2016, 2022)",
+                "logement":        "INSEE Melodi DS_RP_LOGEMENT_PRINC (2011, 2016, 2022)",
+                "activite":        "INSEE Melodi DS_RP_ACTIVITE_PRINC (2011, 2016, 2022)",
+                "revenus":         "INSEE Melodi DS_FILOSOFI_CC + DS_FILOSOFI_MEN_TP_NIVVIE (2021)",
+                "finances":        "DGFiP data.gouv.fr 2000-2016 + OFGL 2017-2024 (cbudg=1)",
             },
         },
-        "population": population,
-        "finances":   finances,
+        "population":     population,
+        "population_age": population_age,
+        "logement":       logement,
+        "activite":       activite,
+        "revenus":        revenus,
+        "finances":       finances,
     }
 
     with OUTPUT_FILE.open("w", encoding="utf-8") as f:
